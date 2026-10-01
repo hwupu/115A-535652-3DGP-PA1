@@ -1,0 +1,26 @@
+# CLAUDE.md — AI context for "The Boomerang Guardian" (3DGP PA1)
+
+## Project
+- NYCU 535652 3D Game Programming, Programming Assignment 1 (single-person).
+- Spec: `docs/reference/3DGP_PA_01_Instruction.pdf`. Rubric → backlog mapping: `docs/00-requirements-traceability.md`.
+- Engine: **Unity 6000.3.25f1 LTS**, URP (Universal 3D template). This folder **is** the Unity project root.
+- Target finish ≈ 2026-10-14 (2 weeks starting 2026-10-01).
+
+## Roles
+- **User**: Product Owner, then asset / 3D / sound designer and scene builder (works in the Unity Editor).
+- **Claude**: Scrum Master, then programming assistant. Claude writes C# scripts and gives step-by-step Editor instructions when asked. Claude does **not** edit scenes/prefabs (`.unity`/`.prefab` YAML) unless explicitly asked.
+
+## Code conventions
+- All our own content lives in `Assets/_Project/`; third-party packs stay in their own folders.
+- Scripts: `Assets/_Project/Scripts/{Core,Player,Camera,Boomerang,Spawning,Interaction,UI,Audio}`; namespace `BoomerangGuardian.<Folder>`.
+- One MonoBehaviour per file, file name = class name. Use `[SerializeField] private` fields with `[Tooltip]` for tunables. Avoid public fields.
+- Unity 6 APIs: `Rigidbody.linearVelocity` (not `velocity`), `FindObjectsByType`, **Input System package** (no legacy `Input.GetKey`).
+- Theme-agnostic: gameplay code never references specific art assets. Prefabs are injected through ScriptableObjects or the Inspector.
+- Identify objects by component (`Target`, `Obstacle`, `Collectible`), not by tag strings.
+
+## Process
+- Backlog: `docs/01-product-backlog.md`. Current sprint: `docs/sprints/`. Decisions: `docs/decisions/ADR-*.md`.
+- Commit messages: `type(PB-xx): summary` (types: feat, fix, docs, chore, refactor, asset).
+- After each significant AI interaction, append an entry to `docs/ai-log/prompt-log.md`.
+- Record reflection observations as they happen in `docs/report/reflection-notes.md`.
+- Definition of Done: `docs/02-definition-of-done.md`.

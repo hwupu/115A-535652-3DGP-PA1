@@ -1,0 +1,97 @@
+# =========================================================
+# Unity — generated / cache / temp (never commit)
+# =========================================================
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/.utmp/
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/Plugins/Editor/JetBrains*
+/[Aa]ssets/AssetStoreTools*
+
+# Keep .meta files for every tracked asset
+!/[Aa]ssets/**/*.meta
+
+# Crash reports / misc temp
+sysinfo.txt
+mono_crash.*
+crashlytics-build.properties
+*.tmp
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# =========================================================
+# Unity builds (never commit; zip separately for submission)
+# =========================================================
+/[Bb]uild/
+/[Bb]uilds/
+/[Bb]uild[Ss]/
+/[Ee]xport/
+*.app
+*.dSYM/
+*.apk
+*.aab
+*.unitypackage
+*_BurstDebugInformation_DoNotShip/
+*_BackUpThisFolder_ButDontShipItWithYourGame/
+*.zip
+
+# =========================================================
+# IDE / generated solution files (Rider, VS Code, Visual Studio)
+# =========================================================
+.idea/
+.vs/
+.vscode/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+ExportedObj/
+
+# =========================================================
+# macOS
+# =========================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+# macOS custom-folder icon file is named "Icon\r"; matched exactly (a plain `Icon?` would also ignore folders like `Icons/`)
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# =========================================================
+# Windows (in case the project is opened on a PC)
+# =========================================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
