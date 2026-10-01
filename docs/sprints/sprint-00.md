@@ -13,7 +13,7 @@
 | `git init` + `git lfs install` + remote (User); first commit (Claude) | User + Claude | ✅ |
 | Push to GitHub. PO decided to keep the repo **public** | User + Claude | ✅ |
 | GitHub Issues #1–#24 + 4 sprint milestones + labels | Claude | ✅ |
-| GitHub Project (board view): needs the `project` token scope | User refreshes auth, Claude creates it | ⬜ |
+| GitHub Project (board view): needs the `project` token scope. The first refresh attempt didn't apply | User refreshes auth, Claude creates it | ⬜ |
 
 ## Daily log
 - **2026-10-01**: Spec read (14 pages). PO decisions: ~2-week timeline, theme TBD after the asset search, Git + private GitHub, collectibles = bonus score only. Backlog (24 items, ~51 Must SP) and a 3-sprint plan approved. The PO decided that this folder is the Unity root, so the instruction PDF moved to `docs/reference/`. The PO added Git LFS as a requirement, with macOS as the development platform. An AI session was interrupted mid-write; files were checked and recreated (lesson: verify the file state after interruptions).

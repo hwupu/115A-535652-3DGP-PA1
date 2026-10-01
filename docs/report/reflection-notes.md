@@ -9,6 +9,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 
 - (2026-10-01) The AI noticed the GitHub repo was public, against the plan. AI as a checklist enforcer catches small but important process slips.
 
+- (2026-10-01) For the respawn ambiguity the AI offered A/B options; the PO chose a third way (a runtime config toggle). AI options are a starting point, not the boundary.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.
