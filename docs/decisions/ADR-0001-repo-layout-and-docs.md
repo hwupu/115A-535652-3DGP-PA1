@@ -12,3 +12,6 @@ The assignment folder is the Unity project root and the git root. `docs/` sits b
 
 ## Consequences
 The zip is just the folder minus the ignored directories. Unity Hub can't create a project in a non-empty folder, so the project is created elsewhere and its contents moved in (see Sprint 0 log). GitHub LFS free quota: 10 GiB storage and bandwidth (Git LFS on GitHub Free), which is plenty for this project.
+
+## Amendment (2026-10-01)
+The PO chose to keep the GitHub repo **public**. Consequence: every committed third-party asset must have a license that permits redistribution. Otherwise, keep it out of git (e.g. import locally, and document how to obtain it).

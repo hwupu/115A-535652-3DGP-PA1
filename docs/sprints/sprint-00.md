@@ -11,8 +11,9 @@
 | `.gitignore` (Unity/macOS/builds) + `.gitattributes` (Git LFS) | Claude | ✅ |
 | Create Unity 6000.3.25f1 URP project in this folder | User (created in `My project/`), Claude moved it to the root | ✅ |
 | `git init` + `git lfs install` + remote (User); first commit (Claude) | User + Claude | ✅ |
-| Push to GitHub. **Blocked:** the remote repo is currently PUBLIC; the PO must decide on visibility | User | ⬜ |
-| GitHub Project board from the backlog | Claude (after the User confirms) | ⬜ |
+| Push to GitHub. PO decided to keep the repo **public** | User + Claude | ✅ |
+| GitHub Issues #1–#24 + 4 sprint milestones + labels | Claude | ✅ |
+| GitHub Project (board view): needs the `project` token scope | User refreshes auth, Claude creates it | ⬜ |
 
 ## Daily log
 - **2026-10-01**: Spec read (14 pages). PO decisions: ~2-week timeline, theme TBD after the asset search, Git + private GitHub, collectibles = bonus score only. Backlog (24 items, ~51 Must SP) and a 3-sprint plan approved. The PO decided that this folder is the Unity root, so the instruction PDF moved to `docs/reference/`. The PO added Git LFS as a requirement, with macOS as the development platform. An AI session was interrupted mid-write; files were checked and recreated (lesson: verify the file state after interruptions).

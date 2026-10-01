@@ -20,7 +20,8 @@
 
 ## Process
 - Backlog: `docs/01-product-backlog.md`. Current sprint: `docs/sprints/`. Decisions: `docs/decisions/ADR-*.md`.
-- Commit messages: `type(PB-xx): summary` (types: feat, fix, docs, chore, refactor, asset).
+- Commit messages: `type(PB-xx): summary (#issue)` (types: feat, fix, docs, chore, refactor, asset). GitHub issue number = PB number + 1 (see the backlog's Issue column). Use `Closes #n` when an item meets the DoD.
+- GitHub repo `hwupu/115A-535652-3DGP-PA1` is **public** (PO decision), so never commit assets whose license forbids redistribution.
 - After each significant AI interaction, append an entry to `docs/ai-log/prompt-log.md`.
 - Record reflection observations as they happen in `docs/report/reflection-notes.md`.
 - Definition of Done: `docs/02-definition-of-done.md`.
