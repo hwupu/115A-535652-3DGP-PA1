@@ -34,3 +34,7 @@ docs/
   report/               report notes, draft, final PDF
 CLAUDE.md               context file for the AI assistant
 ```
+
+## Process links
+- Sprint board: https://github.com/users/hwupu/projects/1
+- Issues / milestones: https://github.com/hwupu/115A-535652-3DGP-PA1/issues

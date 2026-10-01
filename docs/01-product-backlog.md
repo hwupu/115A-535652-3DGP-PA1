@@ -3,11 +3,11 @@
 Owner: User (Product Owner) · Facilitator: Claude (Scrum Master)
 Priority: MoSCoW. SP = story points (1 SP ≈ 1–2 h). Marks = rubric points covered.
 Created 2026-10-01 (Sprint 0). This is a living document; refine it at each Sprint Planning.
-This file is the source of truth. GitHub Issues + Milestones (one per sprint) mirror it as the visual board: https://github.com/hwupu/115A-535652-3DGP-PA1/issues
+This file is the source of truth. GitHub mirrors it: Issues + Milestones (one per sprint) + Project board https://github.com/users/hwupu/projects/1
 
 | ID | Issue | User story / item | Acceptance criteria | Marks | Pri | SP | Sprint | Status |
 |---|---|---|---|---|---|---|---|---|
-| PB-00 | [#1](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/1) | *Setup*: repo, Unity project, docs skeleton, CLAUDE.md, ADRs, GitHub board | Project opens in 6000.3.25f1; first commit pushed to GitHub (public, PO decision) | – | Must | 2 | 0 | 🟨 |
+| PB-00 | [#1](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/1) | *Setup*: repo, Unity project, docs skeleton, CLAUDE.md, ADRs, GitHub board | Project opens in 6000.3.25f1; first commit pushed to GitHub (public, PO decision) | – | Must | 2 | 0 | ✅ |
 | PB-01 | [#2](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/2) | As a player I explore a **bounded arena** | Large ground (~100×100 m); cube walls on 4 sides; platform at the center; logical hierarchy & naming | 10 | Must | 2 | 1 | ⬜ |
 | PB-02 | [#3](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/3) | As a player I **move with W/S (+ A/D strafe) relative to the camera view**, smoothly | W forward / S back along the camera's flattened forward; A/D strafe along the camera's right (PO extra); acceleration smoothing; the character faces the move/camera direction | 8 | Must | 3 | 1 | ⬜ |
 | PB-03 | [#4](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/4) | As a player I **toggle normal/fast speed** with SPACE | Toggle (not hold); clear difference (e.g. 5 → 10 m/s); HUD indicator | 4 | Must | 1 | 1 | ⬜ |

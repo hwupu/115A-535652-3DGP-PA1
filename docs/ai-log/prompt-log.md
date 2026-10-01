@@ -45,3 +45,9 @@ Template:
 - **Decisions by User:** A/D strafe (beyond the spec); free cursor + hold RMB to look; for respawn the PO rejected both offered options and asked for a **`config.json` toggle**, so the behaviour can match the TA's interpretation. That became ADR-0008 and the new PB-24 (#25).
 - **Note:** the PO's answer improved on the AI's options. A good example of the human owning product decisions.
 - **Limitation:** `gh auth refresh` did not add the `project` scope on the first try, so the GitHub Project board is still pending.
+
+## 2026-10-01 · #06 · GitHub Project board · Sprint 0 · PB-00
+- **Intent:** Create a visual sprint board for report evidence.
+- **AI output:** The User's `! gh …` message came through as plain text and wasn't executed. The AI noticed the scope was unchanged, started the device-code flow itself in the background, and passed the one-time code to the User. After authorization, it created Project #1, linked the repo, added 25 issues, and set Status and a new Story Points field from the backlog by script.
+- **Limitation:** the GitHub CLI/API can't configure board *views* (layout, grouping), so that is a manual step for the User.
+- **Verification:** queried the item list. PB-00 In Progress / 2 SP, PB-01 Todo / 2 SP, PB-23 Done.
