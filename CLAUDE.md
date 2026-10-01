@@ -12,7 +12,9 @@
 
 ## Code conventions
 - All our own content lives in `Assets/_Project/`; third-party packs stay in their own folders.
-- Scripts: `Assets/_Project/Scripts/{Core,Player,Camera,Boomerang,Spawning,Interaction,UI,Audio}`; namespace `BoomerangGuardian.<Folder>`.
+- Scripts: `Assets/_Project/Scripts/{Core,Player,Cameras,Boomerang,Spawning,Interaction,UI,Audio}`; namespace `BoomerangGuardian.<Folder>`. The folder is `Cameras` (plural) because a `BoomerangGuardian.Camera` namespace would shadow `UnityEngine.Camera`.
+- Compile check without opening the Editor (only when the Editor is closed): `/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then grep for `error CS`.
+- Step-by-step Editor guides for the User live in `docs/guides/`.
 - One MonoBehaviour per file, file name = class name. Use `[SerializeField] private` fields with `[Tooltip]` for tunables. Avoid public fields.
 - Unity 6 APIs: `Rigidbody.linearVelocity` (not `velocity`), `FindObjectsByType`, **Input System package** (no legacy `Input.GetKey`).
 - Theme-agnostic: gameplay code never references specific art assets. Prefabs are injected through ScriptableObjects or the Inspector.

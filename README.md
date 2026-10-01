@@ -11,13 +11,15 @@ Unity **6000.3.25f1 LTS** (URP).
 | Key | Action |
 |---|---|
 | W / S | Move forward / backward (relative to the camera view) |
-| Mouse | Look / turn (details TBD in Sprint 1) |
+| A / D | Strafe left / right (extra) |
+| Hold right mouse | Look around (pitch / yaw) |
 | SPACE | Toggle normal / fast speed |
 | F | Jump |
 | V | Switch first-person / third-person camera |
 | Mouse wheel | Third-person camera distance |
 | Left click | Select a target → throw the boomerang (3 s cooldown) |
 | ESC | Quit |
+| F5 | Reload `config.json` (Sprint 2) |
 
 ## Repository map
 ```

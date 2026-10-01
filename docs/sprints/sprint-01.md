@@ -17,12 +17,12 @@
 
 ## Task breakdown
 **Claude (code + guide)**
-- [ ] C1 `Assets/_Project/Settings/PlayerControls.inputactions`: Move (WASD), Look (mouse delta), LookHold (RMB), ToggleSpeed (Space), Jump (F), SwitchView (V), Zoom (scroll), Select (LMB), Quit (Esc), ReloadConfig (F5). We use our own map instead of the template's `InputSystem_Actions` (Space = Jump there, which conflicts with the spec).
-- [ ] C2 `Player/PlayerInputReader`: wraps the actions asset and exposes values/events to other scripts.
-- [ ] C3 `Player/PlayerMotor`: Rigidbody movement relative to camera yaw, acceleration smoothing, speed toggle, grounded jump, air momentum (ADR-0004).
-- [ ] C4 `Camera/CameraRig`: FP/TP modes, RMB-held pitch/yaw (pitch clamped), scroll distance, wall-clip SphereCast, V toggle.
-- [ ] C5 `Core/ApplicationController`: ESC → `Application.Quit()` / exit Play Mode in the Editor.
-- [ ] C6 Step-by-step Editor guide `docs/guides/sprint-01-scene-setup.md` (scene, arena, player, camera, physics materials, layers).
+- [x] C1 `Assets/_Project/Settings/PlayerControls.inputactions`: Move (WASD), Look (mouse delta), LookHold (RMB), ToggleSpeed (Space), Jump (F), SwitchView (V), Zoom (scroll), Select (LMB), Quit (Esc), ReloadConfig (F5). We use our own map instead of the template's `InputSystem_Actions` (Space = Jump there, which conflicts with the spec).
+- [x] C2 `Player/PlayerInputReader`: wraps the actions asset and exposes values/events to other scripts.
+- [x] C3 `Player/PlayerMotor`: Rigidbody movement relative to camera yaw, acceleration smoothing, speed toggle, grounded jump, air momentum (ADR-0004).
+- [x] C4 `Cameras/CameraRig`: FP/TP modes, RMB-held pitch/yaw (pitch clamped), scroll distance, wall-clip SphereCast, V toggle.
+- [x] C5 `Core/ApplicationController`: ESC → `Application.Quit()` / exit Play Mode in the Editor.
+- [x] C6 Step-by-step Editor guide `docs/guides/sprint-01-scene-setup.md` (scene, arena, player, camera, physics materials, layers).
 
 **User (Editor / scene)**
 - [ ] U1 Create `Assets/_Project/Scenes/Main.unity` and build the greybox arena following the guide.
@@ -43,6 +43,8 @@
 
 ## Daily log
 - **2026-10-01**: Sprint planning. PO decisions: A/D strafe, RMB-hold look, respawn configurable via `config.json` (new PB-24 #25, Sprint 2). Template check: Input System only (`activeInputHandler: 1`), URP 17.3, Input System 1.20.
+
+- **2026-10-01**: Claude wrote C1–C6. Compile-checked in Unity batch mode: 0 errors, 0 warnings, and the input asset imported. Not yet play-tested; that needs the User's scene (guide: `docs/guides/sprint-01-scene-setup.md`). Namespace `Camera` → `Cameras` to avoid shadowing `UnityEngine.Camera`.
 
 ## Review
 

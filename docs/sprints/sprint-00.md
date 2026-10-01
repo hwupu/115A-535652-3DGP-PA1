@@ -23,7 +23,8 @@
 - **Sprint goal met.** Unity project at the repo root, Git + LFS, pushed to GitHub. Docs skeleton, 8 ADRs, backlog mirrored as issues #1–#25, 4 sprint milestones, Project board.
 - Backlog changes during the sprint: + PB-24 runtime `config.json` (from the respawn decision).
 
-## Retro (draft by SM; PO to confirm/edit)
+## Retro (drafted by SM, confirmed by PO)
 - **Keep:** asking clarifying questions before planning; recording every PO decision immediately (backlog decisions log + ADR).
 - **Problem:** environment friction cost time. The interrupted AI write, the folder renamed mid-session, and the `gh` auth scope refresh (3 attempts) all happened.
 - **Try:** at the end of each AI session, verify the file/git state (`git status`) before moving on. Do environment changes (renames, auth) between sessions, not during one.
+- **PO comment:** the folder rename and re-login were deliberate setup steps; nothing further to reflect on.
