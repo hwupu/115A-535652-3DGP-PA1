@@ -4,22 +4,22 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 
 | # | Rubric category / item | Marks | Backlog | Status | Verified how |
 |---|---|---|---|---|---|
-| 1 | **Scene construction** — ground plane | 2 | PB-01 | ⬜ | |
-| | boundary construction (cubes) | 2 | PB-01 | ⬜ | |
-| | playable region appropriately sized | 2 | PB-01 | ⬜ | |
-| 2 | **Object organization** — required categories present (ground, boundary, targets, obstacles, player, boomerang, platform) | 2 | PB-01, PB-08 | ⬜ | |
-| | logical hierarchy & naming | 2 | PB-01 | ⬜ | |
-| 3 | **Player movement** — W/S forward/backward | 3 | PB-02 | ⬜ | |
-| | camera-relative movement | 3 | PB-02 | ⬜ | |
-| | smooth movement | 2 | PB-02 | ⬜ | |
-| 4 | **Speed toggle** — SPACE toggles | 2 | PB-03 | ⬜ | |
-| | appropriate speed difference | 2 | PB-03 | ⬜ | |
-| 5 | **Jump/gravity/projectile** — F jump | 3 | PB-04 | ⬜ | |
-| | gravity | 3 | PB-04 | ⬜ | |
-| | projectile motion while jumping | 2 | PB-04 | ⬜ | |
-| 6 | **Camera** — first-person (pitch, yaw) | 3 | PB-05 | ⬜ | |
-| | third-person | 3 | PB-05 | ⬜ | |
-| | pitch, yaw, distance control | 2 | PB-05 | ⬜ | |
+| 1 | **Scene construction** — ground plane | 2 | PB-01 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | boundary construction (cubes) | 2 | PB-01 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | playable region appropriately sized | 2 | PB-01 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| 2 | **Object organization** — required categories present (ground, boundary, targets, obstacles, player, boomerang, platform) | 2 | PB-01, PB-08 | 🟨 | ground, boundary, player, platform done; targets/obstacles/boomerang in Sprint 2 |
+| | logical hierarchy & naming | 2 | PB-01 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| 3 | **Player movement** — W/S forward/backward | 3 | PB-02 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | camera-relative movement | 3 | PB-02 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | smooth movement | 2 | PB-02 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| 4 | **Speed toggle** — SPACE toggles | 2 | PB-03 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | appropriate speed difference | 2 | PB-03 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| 5 | **Jump/gravity/projectile** — F jump | 3 | PB-04 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | gravity | 3 | PB-04 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | projectile motion while jumping | 2 | PB-04 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| 6 | **Camera** — first-person (pitch, yaw) | 3 | PB-05 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | third-person | 3 | PB-05 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
+| | pitch, yaw, distance control | 2 | PB-05 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
 | 7 | **Ray casting** — accurate picking (LMB) | 4 | PB-06 | ⬜ | |
 | | wrong selection handling (error SFX) | 3 | PB-06, PB-16 | ⬜ | |
 | 8 | **Boomerang** — throwing system | 3 | PB-07 | ⬜ | |
@@ -37,7 +37,7 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 | 11 | **Physics response** — boomerang impact | 3 | PB-10 | ⬜ | |
 | | push effect on targets | 2 | PB-10 | ⬜ | |
 | | target disappears after 2 s | 2 | PB-10 | ⬜ | |
-| | player pushes obstacles | 1 | PB-11 | ⬜ | |
+| | player pushes obstacles | 1 | PB-11 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
 | 12 | **Platform & triggers** — trigger detection | 3 | PB-12 | ⬜ | |
 | | remove all objects on entry | 2 | PB-12 | ⬜ | |
 | | respawn objects on exit | 3 | PB-12 | ⬜ | |
@@ -47,6 +47,6 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 | | score updates correctly | 1 | PB-14 | ⬜ | |
 | | functional minimap (upper-right) | 2 | PB-15 | ⬜ | |
 | 15 | **Audio & control** — 5 SFX (throw, hit, invalid, enter platform, leave platform) | 3 | PB-16 | ⬜ | |
-| | ESC quits | 1 | PB-17 | ⬜ | |
+| | ESC quits | 1 | PB-17 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review); Editor only, re-check in build (PB-21) |
 | | **Total** | **100** | | | |
 | B | **Report PDF** (1–2 pages, ≥ 500 words, AI usage, Scrum, reflection, asset credits) | +10 / −10 | PB-22 | ⬜ | |
