@@ -83,3 +83,7 @@ Template:
 - **Re-plan:** 5 sprints; new milestones and issues created via `gh`.
 - **Sprint 3 output:** minimap (camera + RT + icon system), Hero's Journey controller (intro, 7 stages from the assignment text, hints, ending), input gating, Sprint3Setup, BuildScript.
 - **Verification:** APFS clone → compile OK; setup run 1 full report, run 2 zero changes; spawn smoke ×3 with icons OK; **macOS build OK**; ran the built player headless and confirmed the beside-app `config.json` override from the log. Not verifiable by AI: visual layout and feel → PO play-test.
+
+## 2026-10-03 · #12 · Sprint 3 Review · Sprint 3
+- **PO feedback:** tested and confirmed Sprint 3 (Editor + macOS build).
+- **AI action:** committed the setup-generated assets (icon materials, RT, arrow mesh, prefab icons, scene, layer/product settings) and closed #16, #20, #22 and the milestone.
