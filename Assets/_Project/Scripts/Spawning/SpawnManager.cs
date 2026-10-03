@@ -29,7 +29,7 @@ namespace BoomerangGuardian.Spawning
         [Tooltip("Prefab lists for targets, obstacles and collectibles.")]
         [SerializeField] private SpawnConfig spawnConfig;
         [Tooltip("Parent for spawned objects (e.g. Gameplay/Spawned). Created if empty.")]
-        [SerializeField] private Transform spawnRoot;
+        [SerializeField, OptionalReference] private Transform spawnRoot;
 
         [Header("Fallback values (used when no config.json is loaded)")]
         [SerializeField, Min(0)] private int targetCount = 150;

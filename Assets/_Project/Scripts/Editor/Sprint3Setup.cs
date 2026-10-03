@@ -101,6 +101,7 @@ namespace BoomerangGuardian.EditorTools
                 return Finish(u, scene);
             }
 
+            u.LinkIfEmpty(motor, "cameraRig", rig);   // repair: Sprint 1 was wired by hand
             AddPlayerIcon(u, motor.transform, layer, arrow, iconPlayer);
             AddStaticIcons(u, scene, layer, iconGround, iconWall, iconPlatform);
 
@@ -534,7 +535,7 @@ namespace BoomerangGuardian.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
-            return "Boomerang Guardian: Sprint 3 setup report\n" + u.Log;
+            return "Boomerang Guardian: Sprint 3 setup report\n" + u.Log + WiringValidator.Report();
         }
     }
 }

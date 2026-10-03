@@ -18,3 +18,9 @@ In Sprint 1 the PO wired the scene by hand following a guide. It worked first tr
 - This saves PO time and makes setup reproducible. The scripts are also evidence of AI-assisted tooling for the report.
 - It costs about 1–2 SP of Claude time per sprint.
 - Batch-mode runs need the Editor to be closed. The menu route works with it open, and Cmd+Z undoes changes.
+
+## Amendment (2026-10-03, Sprint 4): wiring validation
+A reference wired by hand in Sprint 1 (`PlayerMotor.cameraRig`) stayed empty for two sprints, hidden by a silent fallback. Changes:
+- **Fail loudly:** runtime fallbacks for missing references must log a warning or error.
+- `[OptionalReference]` marks fields that may be empty. **Boomerang Guardian → Validate Wiring** (`WiringValidator`) lists all other empty references on our components, and runs at the end of every setup script.
+- Setup scripts also link references that earlier manual guides were responsible for (repair on rerun).

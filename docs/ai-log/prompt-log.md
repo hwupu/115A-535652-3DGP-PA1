@@ -87,3 +87,9 @@ Template:
 ## 2026-10-03 · #12 · Sprint 3 Review · Sprint 3
 - **PO feedback:** tested and confirmed Sprint 3 (Editor + macOS build).
 - **AI action:** committed the setup-generated assets (icon materials, RT, arrow mesh, prefab icons, scene, layer/product settings) and closed #16, #20, #22 and the milestone.
+
+## 2026-10-03 · #13 · Facing bug, validator, asset-swap guide · Sprint 4 · PB-25, 26, 27
+- **PO input:** "The player seems not rotating? … when player rotate the camera with mouse, while pressing W … the camera and player should move forward, not locked to z-axis." Spawn delay: false alarm. Asked for mesh-swap steps. Report on hold.
+- **AI diagnosis:** the described behaviour was the intended design, so it suspected wiring rather than logic. Parsed the scene YAML with a script and listed every empty object reference on our components: only `PlayerMotor.cameraRig`. Explained the root cause honestly (AI's silent fallback hid a missed manual step for two sprints) and **corrected the traceability record** for "camera-relative movement".
+- **Fix:** auto-find + warning in `PlayerMotor`; `[OptionalReference]` + `WiringValidator` menu (runs after each setup); Sprint 3 setup now links the field. Verified in a clone: the validator flagged exactly one field, and the setup rerun linked only that field.
+- **Guide:** `docs/guides/asset-swap.md` (licensing on a public repo, import/material conversion, Model-container swap, pivot rule, primitive colliders, prefab variants + SpawnConfig, boomerang, Mixamo player, environment rules from the spec, HUD restyle, checks).

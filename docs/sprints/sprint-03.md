@@ -36,7 +36,7 @@ Five sprints instead of three. S3 feature-complete → S4 logic polish + PO feed
 - Done: PB-15, PB-19, PB-21 (first build; repeated in Sprint 5 with final art).
 - Traceability: **all 100 rubric marks are now implemented and verified**, except the real SFX (placeholder tones play for all 5 events; real clips come in Sprint 5).
 
-## Retro
-- Keep:
-- Problem:
-- Try:
+## Retro (2026-10-03, PO input)
+- **Keep:** "Everything is working well for Sprint 3." Setup menu + clone verification + headless build check.
+- **Problem (found while testing PB-26):** with a `Nose` added, the PO saw that the player never turned and W always moved along world Z. Root cause: `PlayerMotor.cameraRig` had been **empty since Sprint 1** (manual guide step E-3). The code silently fell back to the player's own yaw, so the bug was hidden, and the Sprint 1 checklist item 3 was passed without catching it.
+- **Try:** fail loudly instead of falling back silently. Automated wiring validation after every setup. Prefer setup scripts over manual wiring (ADR-0009 already does this from Sprint 2).

@@ -31,9 +31,9 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | PB-21 | [#22](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/22) | Build + final rubric test pass | Every row in `00-requirements-traceability.md` verified; standalone build runs; ESC quits | – | Must | 2 | 3 | ✅ |
 | PB-22 | [#23](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/23) | **Report PDF** | 1–2 pages, ≥ 500 words, screenshots, asset credits; Claude drafts AI + Scrum sections; User writes self-reflection | +10% | Must | 3 | 5 | ⬜ |
 | PB-24 | [#25](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/25) | As the PO I can **tune the demo via `config.json`** without rebuilding | Loaded from beside the app → StreamingAssets → defaults; respawnMode, counts, speeds; validated + clamped; effective values logged; F5 reloads (ADR-0008) | (12) | Must | 1.5 | 2 | ✅ |
-| PB-25 | [#26](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/26) | As the designer I can **swap / vary models and restyle the HUD** | Guide: replace a prefab's `Model` child, fix the collider, create variants and add them to `SpawnConfig`, restyle `UI/HUD`; setup scripts keep working | quality | Should | – | 4 | ⬜ |
-| PB-26 | [#27](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/27) | **Player facing** while the camera rotates (investigate) | PO tests first, then chooses: keep (face camera yaw) / face movement direction / face camera only when moving | quality | Could | – | 4 | ⬜ |
-| PB-27 | [#28](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/28) | **Perceived spawn delay** (investigate) → loading overlay if needed | PO describes when the delay happens; add timing logs; fix the cause (Editor domain reload vs. respawn hitch vs. first frame); loading overlay if useful | quality | Could | – | 4 | ⬜ |
+| PB-25 | [#26](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/26) | As the designer I can **swap / vary models and restyle the HUD** | Guide: replace a prefab's `Model` child, fix the collider, create variants and add them to `SpawnConfig`, restyle `UI/HUD`; setup scripts keep working | quality | Should | – | 4 | 🟨 |
+| PB-26 | [#27](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/27) | **Player facing** while the camera rotates (investigate) | PO tests first, then chooses: keep (face camera yaw) / face movement direction / face camera only when moving | quality | Could | – | 4 | 🟨 |
+| PB-27 | [#28](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/28) | **Perceived spawn delay** (investigate) → loading overlay if needed | PO describes when the delay happens; add timing logs; fix the cause (Editor domain reload vs. respawn hitch vs. first frame); loading overlay if useful | quality | Could | – | 4 | ❌ |
 | PB-23 | [#24](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/24) | Pause menu / restart | — | — | Won't | – | – | ❌ |
 
 **Must total ≈ 52.5 SP.**
@@ -54,4 +54,7 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | 2026-10-03 | Sprint 2 dates / SP | Start Oct 3, end Oct 8; story points not tracked further |
 | 2026-10-03 | Sprint layout | 5 sprints: S3 feature-complete (Oct 3–5), S4 logic polish + feedback (Oct 6–8), S5 art & audio (Oct 9–12), Oct 13–14 buffer/submit |
 | 2026-10-03 | Player facing / spawn delay | **No change yet**: the PO will test more first (PB-26, PB-27) |
+| 2026-10-03 | PB-26 facing | After testing: expected = player and movement follow the camera yaw (already the design) → it was a **bug** (missing link), fixed |
+| 2026-10-03 | PB-27 spawn delay | False alarm → closed |
+| 2026-10-03 | PB-22 report | Hold until the PO has finished everything |
 | TBD (Sprint 5) | Theme / models | PO swaps models in Sprint 5 |

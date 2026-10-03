@@ -1,4 +1,5 @@
 using BoomerangGuardian.Boomerang;
+using BoomerangGuardian.Core;
 using BoomerangGuardian.Interaction;
 using UnityEngine;
 
@@ -18,14 +19,14 @@ namespace BoomerangGuardian.Audio
         [SerializeField] private GuardianPlatform platform;
 
         [Header("Clips (leave empty to use a placeholder tone)")]
-        [SerializeField] private AudioClip throwClip;
-        [SerializeField] private AudioClip hitTargetClip;
-        [SerializeField] private AudioClip hitObstacleClip;
-        [SerializeField] private AudioClip invalidSelectionClip;
-        [SerializeField] private AudioClip enterPlatformClip;
-        [SerializeField] private AudioClip leavePlatformClip;
-        [SerializeField] private AudioClip collectClip;
-        [SerializeField] private AudioClip catchClip;
+        [SerializeField, OptionalReference] private AudioClip throwClip;
+        [SerializeField, OptionalReference] private AudioClip hitTargetClip;
+        [SerializeField, OptionalReference] private AudioClip hitObstacleClip;
+        [SerializeField, OptionalReference] private AudioClip invalidSelectionClip;
+        [SerializeField, OptionalReference] private AudioClip enterPlatformClip;
+        [SerializeField, OptionalReference] private AudioClip leavePlatformClip;
+        [SerializeField, OptionalReference] private AudioClip collectClip;
+        [SerializeField, OptionalReference] private AudioClip catchClip;
 
         [Header("Mix")]
         [SerializeField, Range(0f, 1f)] private float volume = 0.8f;

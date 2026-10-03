@@ -1,4 +1,5 @@
 using System;
+using BoomerangGuardian.Core;
 using BoomerangGuardian.Player;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -29,7 +30,7 @@ namespace BoomerangGuardian.Cameras
         [Tooltip("Input source (on the Player).")]
         [SerializeField] private PlayerInputReader input;
         [Tooltip("Renderers switched to shadows-only in first person, e.g. the player body.")]
-        [SerializeField] private Renderer[] hideInFirstPerson = Array.Empty<Renderer>();
+        [SerializeField, OptionalReference] private Renderer[] hideInFirstPerson = Array.Empty<Renderer>();
 
         [Header("Look (hold RMB)")]
         [Tooltip("Degrees of rotation per pixel of mouse movement.")]

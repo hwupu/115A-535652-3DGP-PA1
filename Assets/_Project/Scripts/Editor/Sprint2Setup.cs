@@ -450,7 +450,7 @@ namespace BoomerangGuardian.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
-            return "Boomerang Guardian: Sprint 2 setup report\n" + u.Log;
+            return "Boomerang Guardian: Sprint 2 setup report\n" + u.Log + WiringValidator.Report();
         }
     }
 }

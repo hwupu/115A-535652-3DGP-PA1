@@ -21,7 +21,7 @@ namespace BoomerangGuardian.Core
         public const string FileName = "config.json";
 
         [Tooltip("Input source for F5 (reload). Optional.")]
-        [SerializeField] private PlayerInputReader input;
+        [SerializeField, OptionalReference] private PlayerInputReader input;
 
         public static GameConfig Current { get; private set; }
         public static string LoadedFrom { get; private set; }

@@ -1,4 +1,5 @@
 using System;
+using BoomerangGuardian.Core;
 using BoomerangGuardian.Player;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace BoomerangGuardian.Interaction
     public class Collectible : MonoBehaviour
     {
         [Tooltip("Visual child that spins and bobs (optional).")]
-        [SerializeField] private Transform visual;
+        [SerializeField, OptionalReference] private Transform visual;
         [Tooltip("Spin speed in degrees per second.")]
         [SerializeField] private float spinSpeed = 90f;
         [Tooltip("Bob amplitude in meters.")]

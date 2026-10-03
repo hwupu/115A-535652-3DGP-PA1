@@ -19,6 +19,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 - (2026-10-03) The AI asked clarifying questions about vague feedback ("keep player face front", "takes a while to spawn") rather than implementing a guess. The PO chose to test more first. Asking before acting avoided rework.
 - (2026-10-03) End-to-end automation: the AI could build the game and run it headless to prove a requirement (config next to the app) that would otherwise need a manual test.
 
+- (2026-10-03) **AI-introduced risk:** a "helpful" silent fallback in AI-written code hid a missed manual wiring step for two sprints, and a checklist item was marked as passed. Lesson: AI code should fail loudly, and verification should be automated where possible (wiring validator) rather than relying only on manual checklists.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.
@@ -28,6 +30,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 - (2026-10-03) The PO dropped story-point tracking for a solo, 2-week project. Adapting Scrum ceremonies to the context rather than following them dogmatically.
 
 - (2026-10-03) Sprint 2 finished on day 1, so the PO re-planned into 5 sprints (logic polish before art). Scrum's inspect-and-adapt applied to the plan itself.
+
+- (2026-10-03) The PO's "I want to do more testing before I decide" turned a vague request into a precise bug report a sprint later. Inspection before adaptation.
 
 ## User's self-reflection (to be written by the User)
 - What did I learn?

@@ -88,6 +88,17 @@ namespace BoomerangGuardian.Player
 
             startPosition = body.position;
             startRotation = body.rotation;
+
+            // Without the rig, "forward" would be stuck on world +Z and the player would never turn.
+            if (cameraRig == null)
+            {
+                cameraRig = FindFirstObjectByType<CameraRig>();
+                if (cameraRig != null)
+                    Debug.LogWarning($"{nameof(PlayerMotor)}: Camera Rig was not assigned; using '{cameraRig.name}'. " +
+                                     "Assign it in the Inspector (or run Boomerang Guardian → Validate Wiring).", this);
+                else
+                    Debug.LogError($"{nameof(PlayerMotor)}: no CameraRig in the scene; movement will follow world axes.", this);
+            }
         }
 
         private void OnEnable()
