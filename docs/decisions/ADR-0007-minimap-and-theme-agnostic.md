@@ -12,3 +12,10 @@ An orthographic top-down **minimap camera** follows the player and renders to a 
 
 ## Consequences
 Icons stay readable regardless of art. The User can swap greybox prefabs for themed models without code changes.
+
+## Amendment (2026-10-03, Sprint 3)
+- Icons are `MinimapIcon` children (root keeps level and a fixed world height; a flat `Shape` child on layer **Minimap** = 8). Heights set the draw order: ground 10, walls/platform 11, obstacles 19, targets 20, gems 21, player 25. The camera is at 60.
+- Icon renderers cast and receive no shadows. The main camera's culling mask excludes the Minimap layer.
+- The map is north-up by default, with the player arrow turning (`MinimapCamera.rotateWithTarget` toggles that). The view is 60 × 60 m around the player ("nearby objects").
+- `SpawnManager` ignores `MinimapIcon` renderers when measuring footprints. Otherwise icons floating 20 m up would inflate the footprint height.
+- New prefab variants get icons by rerunning the Sprint 3 setup (it iterates `SpawnConfig`).

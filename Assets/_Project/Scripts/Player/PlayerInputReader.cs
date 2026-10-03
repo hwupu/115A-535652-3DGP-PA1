@@ -24,17 +24,23 @@ namespace BoomerangGuardian.Player
         public event Action QuitPressed;
         public event Action ReloadConfigPressed;
 
+        /// <summary>
+        /// False while a menu (e.g. the intro panel) is open: gameplay values read as zero and
+        /// gameplay events are suppressed. Quit (ESC) and ReloadConfig (F5) keep working.
+        /// </summary>
+        public bool GameplayEnabled { get; private set; } = true;
+
         /// <summary>WASD as (x = strafe, y = forward), each in [-1, 1].</summary>
-        public Vector2 Move => move != null ? move.ReadValue<Vector2>() : Vector2.zero;
+        public Vector2 Move => GameplayEnabled && move != null ? move.ReadValue<Vector2>() : Vector2.zero;
 
         /// <summary>Mouse movement this frame, in pixels.</summary>
-        public Vector2 LookDelta => look != null ? look.ReadValue<Vector2>() : Vector2.zero;
+        public Vector2 LookDelta => GameplayEnabled && look != null ? look.ReadValue<Vector2>() : Vector2.zero;
 
         /// <summary>True while the right mouse button is held.</summary>
-        public bool IsLookHeld => lookHold != null && lookHold.IsPressed();
+        public bool IsLookHeld => GameplayEnabled && lookHold != null && lookHold.IsPressed();
 
         /// <summary>Scroll wheel delta this frame (positive = away from the user).</summary>
-        public float Zoom => zoom != null ? zoom.ReadValue<float>() : 0f;
+        public float Zoom => GameplayEnabled && zoom != null ? zoom.ReadValue<float>() : 0f;
 
         /// <summary>Cursor position in screen pixels, used for ray casting.</summary>
         public Vector2 PointerPosition => point != null ? point.ReadValue<Vector2>() : Vector2.zero;
@@ -92,10 +98,12 @@ namespace BoomerangGuardian.Player
             reloadConfig.performed -= OnReloadConfig;
         }
 
-        private void OnToggleSpeed(InputAction.CallbackContext _) => ToggleSpeedPressed?.Invoke();
-        private void OnJump(InputAction.CallbackContext _) => JumpPressed?.Invoke();
-        private void OnSwitchView(InputAction.CallbackContext _) => SwitchViewPressed?.Invoke();
-        private void OnSelect(InputAction.CallbackContext _) => SelectPressed?.Invoke();
+        public void SetGameplayEnabled(bool value) => GameplayEnabled = value;
+
+        private void OnToggleSpeed(InputAction.CallbackContext _) { if (GameplayEnabled) ToggleSpeedPressed?.Invoke(); }
+        private void OnJump(InputAction.CallbackContext _) { if (GameplayEnabled) JumpPressed?.Invoke(); }
+        private void OnSwitchView(InputAction.CallbackContext _) { if (GameplayEnabled) SwitchViewPressed?.Invoke(); }
+        private void OnSelect(InputAction.CallbackContext _) { if (GameplayEnabled) SelectPressed?.Invoke(); }
         private void OnQuit(InputAction.CallbackContext _) => QuitPressed?.Invoke();
         private void OnReloadConfig(InputAction.CallbackContext _) => ReloadConfigPressed?.Invoke();
     }

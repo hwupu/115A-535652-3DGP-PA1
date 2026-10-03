@@ -19,6 +19,8 @@
 - If the Editor is open, verify in an APFS clone: `cp -cR Assets Packages ProjectSettings Library /tmp/bg-verify/`, then batch-run there (`-executeMethod …`). Never batch-run on the real project while the Editor is open.
 - Prefab convention: the root pivot sits at the ground contact (bottom center); visuals go in a `Model` child; root holds Rigidbody/collider/gameplay component.
 - `Assets/StreamingAssets/config.json` (Unity requires it at the Assets root) holds runtime tunables (ADR-0008).
+- Build: menu **Boomerang Guardian → Build → macOS**, or batch `-executeMethod BoomerangGuardian.EditorTools.BuildScript.BuildMacBatch -buildOutput <path>.app` (in a clone if the Editor is open). Output in `Builds/macOS/` (git-ignored) plus an editable `config.json` next to the `.app`. Headless smoke run: `"<app>/Contents/MacOS/Boomerang Guardian" -batchmode -nographics -logFile <log>`.
+- Menus/panels pause gameplay via `PlayerInputReader.SetGameplayEnabled(false)` + `Time.timeScale = 0`; ESC and F5 keep working.
 - One MonoBehaviour per file, file name = class name. Use `[SerializeField] private` fields with `[Tooltip]` for tunables. Avoid public fields.
 - Unity 6 APIs: `Rigidbody.linearVelocity` (not `velocity`), `FindObjectsByType`, **Input System package** (no legacy `Input.GetKey`).
 - Theme-agnostic: gameplay code never references specific art assets. Prefabs are injected through ScriptableObjects or the Inspector.

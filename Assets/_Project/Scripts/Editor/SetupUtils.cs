@@ -54,6 +54,57 @@ namespace BoomerangGuardian.EditorTools
             return material;
         }
 
+        public Material GetOrCreateUnlitMaterial(string name, Color color)
+        {
+            string folder = $"{ProjectRoot}/Materials/Minimap";
+            string path = $"{folder}/{name}.mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material != null)
+            {
+                Skipped(path);
+                return material;
+            }
+
+            EnsureFolder(folder);
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
+            material = new Material(shader) { name = name };
+            material.SetColor("_BaseColor", color);
+            material.color = color;
+            AssetDatabase.CreateAsset(material, path);
+            Created(path);
+            return material;
+        }
+
+        /// <summary>Returns the index of a named user layer, creating it in the first free slot (8–31) if needed.</summary>
+        public int EnsureLayer(string layerName)
+        {
+            int existing = LayerMask.NameToLayer(layerName);
+            if (existing >= 0)
+            {
+                Skipped($"layer {layerName} ({existing})");
+                return existing;
+            }
+
+            var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            SerializedProperty layers = tagManager.FindProperty("layers");
+            for (int i = 8; i < layers.arraySize; i++)
+            {
+                SerializedProperty slot = layers.GetArrayElementAtIndex(i);
+                if (!string.IsNullOrEmpty(slot.stringValue)) continue;
+                slot.stringValue = layerName;
+                tagManager.ApplyModifiedPropertiesWithoutUndo();
+                Created($"layer {layerName} ({i})");
+                return i;
+            }
+            Warn($"No free layer slot for {layerName}");
+            return -1;
+        }
+
+        public static void SetLayerRecursively(GameObject go, int layer)
+        {
+            foreach (Transform t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = layer;
+        }
+
         // ---------- Scene objects ----------
 
         /// <summary>Finds a GameObject by hierarchy path ("A/B/C") in the scene, creating missing parts.</summary>

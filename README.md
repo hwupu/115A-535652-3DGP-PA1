@@ -7,6 +7,9 @@ Unity **6000.3.25f1 LTS** (URP).
 1. Unity Hub → **Add → Add project from disk** → select this folder.
 2. Open `Assets/_Project/Scenes/Main.unity` and press Play.
 
+## Build
+**Boomerang Guardian → Build → macOS** → `Builds/macOS/BoomerangGuardian.app`, with an editable `config.json` next to it.
+
 ## Controls
 | Key | Action |
 |---|---|

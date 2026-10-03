@@ -45,8 +45,8 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 | | correct trigger behaviour | 1 | PB-13 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
 | 14 | **UI** — score display | 2 | PB-14 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
 | | score updates correctly | 1 | PB-14 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
-| | functional minimap (upper-right) | 2 | PB-15 | ⬜ | |
+| | functional minimap (upper-right) | 2 | PB-15 | 🟨 | implemented + verified in clone; awaiting PO play-test |
 | 15 | **Audio & control** — 5 SFX (throw, hit, invalid, enter platform, leave platform) | 3 | PB-16 | 🟨 | placeholder tones play for all 5 events; real clips in Sprint 3 |
-| | ESC quits | 1 | PB-17 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review); Editor only, re-check in build (PB-21) |
+| | ESC quits | 1 | PB-17 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review); build made 2026-10-03, ESC in the build pending PO check |
 | | **Total** | **100** | | | |
 | B | **Report PDF** (1–2 pages, ≥ 500 words, AI usage, Scrum, reflection, asset credits) | +10 / −10 | PB-22 | ⬜ | |

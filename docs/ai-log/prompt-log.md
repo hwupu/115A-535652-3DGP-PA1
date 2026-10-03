@@ -76,3 +76,10 @@ Template:
 ## 2026-10-03 · #10 · Sprint 2 Review · Sprint 2
 - **PO feedback:** "It is working great". The setup menu and the checklist passed on the first run.
 - **AI action:** committed the setup-generated assets (greybox prefabs, materials, SpawnConfig, scene wiring, TMP Essentials) and closed the Sprint 2 issues via commit. #17 (audio) went back to Sprint 3, since only placeholders exist.
+
+## 2026-10-03 · #11 · Sprint 2 retro → 5-sprint re-plan; Sprint 3 implementation · Sprint 3 · PB-15, 19, 21
+- **PO retro input:** setup script and guide "very helpful". Questions: model customization / variants, player facing during camera rotation, GUI customization, a perceived spawn delay. A loading UI was suggested.
+- **AI handling:** answered the two how-to questions from the existing design (prefab `Model` child; variants via `SpawnConfig` lists; HUD is a normal Canvas). Asked clarifying questions on the two ambiguous ones instead of guessing. The PO answered "let me do more testing, don't change anything yet", so they were logged as PB-26/27 (investigate) with **no code change**. A good example of not over-acting on vague feedback.
+- **Re-plan:** 5 sprints; new milestones and issues created via `gh`.
+- **Sprint 3 output:** minimap (camera + RT + icon system), Hero's Journey controller (intro, 7 stages from the assignment text, hints, ending), input gating, Sprint3Setup, BuildScript.
+- **Verification:** APFS clone → compile OK; setup run 1 full report, run 2 zero changes; spawn smoke ×3 with icons OK; **macOS build OK**; ran the built player headless and confirmed the beside-app `config.json` override from the log. Not verifiable by AI: visual layout and feel → PO play-test.

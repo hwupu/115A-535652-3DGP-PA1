@@ -16,6 +16,9 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 - (2026-10-03) AI verification loop: running the AI's own Editor script in a disposable clone caught a real bug (stale asset reference) before the PO ever saw it. "AI writes, AI tests in a sandbox, human play-tests" worked well.
 - (2026-10-03) Limitation: the AI can compile and run editor-time checks, but can't feel the game (flight curve, sounds, HUD readability), so human play-testing stays essential.
 
+- (2026-10-03) The AI asked clarifying questions about vague feedback ("keep player face front", "takes a while to spawn") rather than implementing a guess. The PO chose to test more first. Asking before acting avoided rework.
+- (2026-10-03) End-to-end automation: the AI could build the game and run it headless to prove a requirement (config next to the app) that would otherwise need a manual test.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.
@@ -23,6 +26,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 - (2026-10-03) Sprint 1 retro produced a concrete process improvement (automate scene wiring with Editor scripts). The retro is useful even solo.
 
 - (2026-10-03) The PO dropped story-point tracking for a solo, 2-week project. Adapting Scrum ceremonies to the context rather than following them dogmatically.
+
+- (2026-10-03) Sprint 2 finished on day 1, so the PO re-planned into 5 sprints (logic polish before art). Scrum's inspect-and-adapt applied to the plan itself.
 
 ## User's self-reflection (to be written by the User)
 - What did I learn?

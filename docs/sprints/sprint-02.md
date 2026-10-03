@@ -54,7 +54,7 @@ Milestone: [Sprint 2 — Core Loop](https://github.com/hwupu/115A-535652-3DGP-PA
 - Traceability: every rubric category except the minimap (Cat. 14) and real SFX (Cat. 15) is now ✅.
 - Observation: the hybrid setup made PO integration take about 10 minutes, against about 45–60 minutes of manual wiring in Sprint 1.
 
-## Retro
-- Keep:
-- Problem:
-- Try:
+## Retro (2026-10-03, PO input)
+- **Keep:** the auto-setup script ("very helpful") plus a clear guide. Sandbox verification before hand-off.
+- **Problem:** no blockers. The PO raised follow-up questions: how to customize / vary target and obstacle models, the player facing while the camera rotates, GUI customization, and a perceived delay when objects spawn.
+- **Try:** turn the questions into backlog items (PB-25 … PB-27). The PO will test facing and spawn delay more **before** we change anything (explicit instruction: "Don't change anything yet"). Re-plan into 5 sprints: art/audio moves to Sprint 5, after the logic polish.

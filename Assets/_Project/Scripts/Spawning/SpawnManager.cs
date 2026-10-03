@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using BoomerangGuardian.Core;
 using BoomerangGuardian.Interaction;
+using BoomerangGuardian.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -257,7 +258,8 @@ namespace BoomerangGuardian.Spawning
             foreach (Collider c in probe.GetComponentsInChildren<Collider>())
                 Encapsulate(ref bounds, ref hasBounds, c.bounds);
             foreach (Renderer r in probe.GetComponentsInChildren<Renderer>())
-                Encapsulate(ref bounds, ref hasBounds, r.bounds);
+                if (r.GetComponentInParent<MinimapIcon>() == null)   // icons float high above; not part of the footprint
+                    Encapsulate(ref bounds, ref hasBounds, r.bounds);
             DestroyImmediate(probe);
 
             Footprint footprint;

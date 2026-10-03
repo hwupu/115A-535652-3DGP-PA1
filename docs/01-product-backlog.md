@@ -23,14 +23,17 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | PB-13 | [#14](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/14) | **Collectibles** | Trigger pickup → disappears, bonus score, SFX | 3 | Must | 1 | 2 | ✅ |
 | PB-14 | [#15](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/15) | **HUD score** | Always visible; updates on hit/collect; also shows targets hit, speed mode, cooldown | 3 | Must | 2 | 2 | ✅ |
 | PB-15 | [#16](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/16) | **Minimap** upper-right | Shows the player (with heading) + nearby targets / obstacles / collectibles / platform in distinct colors; follows the player | 2 | Must | 3 | 3 | ⬜ |
-| PB-16 | [#17](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/17) | **Audio**: 5 required SFX | Throw, hit, invalid selection, enter platform, leave platform (+ optional collect, BGM); AudioManager | 3 | Must | 2 | 3 | 🟨 |
+| PB-16 | [#17](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/17) | **Audio**: 5 required SFX | Throw, hit, invalid selection, enter platform, leave platform (+ optional collect, BGM); AudioManager | 3 | Must | 2 | 5 | 🟨 |
 | PB-17 | [#18](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/18) | **ESC quits** | `Application.Quit()`; stops Play Mode in the Editor | 1 | Must | 0.5 | 1 | ✅ |
-| PB-18 | [#19](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/19) | **Asset integration** (User) | Greybox swapped for theme assets; colliders/scale fixed; credits recorded | quality | Should | 3 | 3 | ⬜ |
+| PB-18 | [#19](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/19) | **Asset integration** (User) | Greybox swapped for theme assets; colliders/scale fixed; credits recorded | quality | Should | 3 | 5 | ⬜ |
 | PB-19 | [#20](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/20) | **Hero's Journey framing** | Intro panel with story + controls; "Balance Restored" message when all targets are cleared | quality | Should | 2 | 3 | ⬜ |
-| PB-20 | [#21](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/21) | **Juice**: hit VFX, boomerang spin + trail, camera shake | — | quality | Could | 2 | 3 | ⬜ |
+| PB-20 | [#21](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/21) | **Juice**: hit VFX, boomerang spin + trail, camera shake | — | quality | Could | 2 | 4 | ⬜ |
 | PB-21 | [#22](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/22) | Build + final rubric test pass | Every row in `00-requirements-traceability.md` verified; standalone build runs; ESC quits | – | Must | 2 | 3 | ⬜ |
-| PB-22 | [#23](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/23) | **Report PDF** | 1–2 pages, ≥ 500 words, screenshots, asset credits; Claude drafts AI + Scrum sections; User writes self-reflection | +10% | Must | 3 | 3 | ⬜ |
+| PB-22 | [#23](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/23) | **Report PDF** | 1–2 pages, ≥ 500 words, screenshots, asset credits; Claude drafts AI + Scrum sections; User writes self-reflection | +10% | Must | 3 | 5 | ⬜ |
 | PB-24 | [#25](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/25) | As the PO I can **tune the demo via `config.json`** without rebuilding | Loaded from beside the app → StreamingAssets → defaults; respawnMode, counts, speeds; validated + clamped; effective values logged; F5 reloads (ADR-0008) | (12) | Must | 1.5 | 2 | ✅ |
+| PB-25 | [#26](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/26) | As the designer I can **swap / vary models and restyle the HUD** | Guide: replace a prefab's `Model` child, fix the collider, create variants and add them to `SpawnConfig`, restyle `UI/HUD`; setup scripts keep working | quality | Should | – | 4 | ⬜ |
+| PB-26 | [#27](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/27) | **Player facing** while the camera rotates (investigate) | PO tests first, then chooses: keep (face camera yaw) / face movement direction / face camera only when moving | quality | Could | – | 4 | ⬜ |
+| PB-27 | [#28](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/28) | **Perceived spawn delay** (investigate) → loading overlay if needed | PO describes when the delay happens; add timing logs; fix the cause (Editor domain reload vs. respawn hitch vs. first frame); loading overlay if useful | quality | Could | – | 4 | ⬜ |
 | PB-23 | [#24](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/24) | Pause menu / restart | — | — | Won't | – | – | ❌ |
 
 **Must total ≈ 52.5 SP.**
@@ -49,4 +52,6 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | 2026-10-03 | Invalid selection | Non-target, too far (> 40 m), during cooldown → error sound + message; already-hit target → ignored |
 | 2026-10-03 | Scoring | Target +10, collectible +5 (config.json) |
 | 2026-10-03 | Sprint 2 dates / SP | Start Oct 3, end Oct 8; story points not tracked further |
-| TBD (before Sprint 3) | Theme | Decide after the asset search |
+| 2026-10-03 | Sprint layout | 5 sprints: S3 feature-complete (Oct 3–5), S4 logic polish + feedback (Oct 6–8), S5 art & audio (Oct 9–12), Oct 13–14 buffer/submit |
+| 2026-10-03 | Player facing / spawn delay | **No change yet**: the PO will test more first (PB-26, PB-27) |
+| TBD (Sprint 5) | Theme / models | PO swaps models in Sprint 5 |
