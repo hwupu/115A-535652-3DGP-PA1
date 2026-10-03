@@ -1,0 +1,14 @@
+{
+    "respawnMode": "Regenerate",
+    "randomSeed": 0,
+    "targetCount": 150,
+    "obstacleCount": 150,
+    "collectibleCount": 30,
+    "normalSpeed": 5.0,
+    "fastSpeed": 10.0,
+    "targetScore": 10,
+    "collectibleScore": 5,
+    "maxThrowRange": 40.0,
+    "boomerangSpeed": 20.0,
+    "boomerangCooldown": 3.0
+}

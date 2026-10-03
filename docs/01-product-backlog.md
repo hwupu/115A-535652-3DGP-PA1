@@ -43,4 +43,10 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | 2026-10-01 | Camera / cursor | Free cursor, **hold RMB to look**; LMB picks under the cursor |
 | 2026-10-01 | A/D keys | **Add A/D strafe** (camera-relative), beyond the spec |
 | 2026-10-01 | Repo visibility | Public |
+| 2026-10-03 | Folder structure | Keep `Assets/_Project/` (best practice) |
+| 2026-10-03 | Scene wiring | Hybrid: Claude's Editor setup scripts + PO art/layout (ADR-0009) |
+| 2026-10-03 | Boomerang hits obstacle | Bounce back early; obstacle nudged, never destroyed |
+| 2026-10-03 | Invalid selection | Non-target, too far (> 40 m), during cooldown → error sound + message; already-hit target → ignored |
+| 2026-10-03 | Scoring | Target +10, collectible +5 (config.json) |
+| 2026-10-03 | Sprint 2 dates / SP | Start Oct 3, end Oct 8; story points not tracked further |
 | TBD (before Sprint 3) | Theme | Decide after the asset search |

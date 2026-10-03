@@ -31,3 +31,8 @@ The spec is ambiguous about "respawn" on platform exit. It could mean (a) a fres
 ## Consequences
 - The TA can see either behaviour on request. Scene-wiring complexity doesn't change.
 - Inspector values become fallbacks, and the JSON overrides them. This is documented in the README.
+
+## Amendment (2026-10-03, Sprint 2)
+- The shipped default lives in `Assets/StreamingAssets/config.json`. Unity requires `StreamingAssets` at the `Assets/` root, the one exception to the `_Project` convention.
+- Keys added: `randomSeed`, `targetScore`, `collectibleScore`, `maxThrowRange`, `boomerangSpeed`, `boomerangCooldown`.
+- When no `ConfigLoader` is in the scene, `ConfigLoader.Current` is null and components fall back to their Inspector values.

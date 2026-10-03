@@ -12,9 +12,13 @@
 
 ## Code conventions
 - All our own content lives in `Assets/_Project/`; third-party packs stay in their own folders.
-- Scripts: `Assets/_Project/Scripts/{Core,Player,Cameras,Boomerang,Spawning,Interaction,UI,Audio}`; namespace `BoomerangGuardian.<Folder>`. The folder is `Cameras` (plural) because a `BoomerangGuardian.Camera` namespace would shadow `UnityEngine.Camera`.
+- Scripts: `Assets/_Project/Scripts/{Core,Player,Cameras,Boomerang,Spawning,Interaction,UI,Audio,Editor}`; namespace `BoomerangGuardian.<Folder>`. The folder is `Cameras` (plural) because a `BoomerangGuardian.Camera` namespace would shadow `UnityEngine.Camera`.
 - Compile check without opening the Editor (only when the Editor is closed): `/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then grep for `error CS`.
 - Step-by-step Editor guides for the User live in `docs/guides/`.
+- Scene wiring is automated with idempotent Editor setup scripts in `Scripts/Editor/` (namespace `BoomerangGuardian.EditorTools`, menu **Boomerang Guardian → Setup**), per ADR-0009. Open the scene before creating assets in a setup run (`OpenScene` unloads in-memory assets).
+- If the Editor is open, verify in an APFS clone: `cp -cR Assets Packages ProjectSettings Library /tmp/bg-verify/`, then batch-run there (`-executeMethod …`). Never batch-run on the real project while the Editor is open.
+- Prefab convention: the root pivot sits at the ground contact (bottom center); visuals go in a `Model` child; root holds Rigidbody/collider/gameplay component.
+- `Assets/StreamingAssets/config.json` (Unity requires it at the Assets root) holds runtime tunables (ADR-0008).
 - One MonoBehaviour per file, file name = class name. Use `[SerializeField] private` fields with `[Tooltip]` for tunables. Avoid public fields.
 - Unity 6 APIs: `Rigidbody.linearVelocity` (not `velocity`), `FindObjectsByType`, **Input System package** (no legacy `Input.GetKey`).
 - Theme-agnostic: gameplay code never references specific art assets. Prefabs are injected through ScriptableObjects or the Inspector.

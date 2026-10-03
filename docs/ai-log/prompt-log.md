@@ -64,3 +64,11 @@ Template:
 - **AI output:** Committed the User's scene, closed 7 issues + milestone via `Closes #…`, updated traceability (17 rubric lines ✅). Explained why `_Project` is used (third-party packs import at the root), and that moving inside the Editor keeps GUID links, so no re-linking is needed. Recommended keeping it, but left the choice to the PO. Didn't touch files on disk because the Editor was open.
 - **Decision by User:** keep `_Project`.
 - **Retro input:** the guide was clear, and the scene was set up first try. The PO asked whether Unity's CLI could build scenes and link components to save time, which became a Sprint 2 planning topic.
+
+## 2026-10-03 · #09 · Hybrid setup + Sprint 2 implementation · Sprint 2 · PB-06..10, 12..14, 16, 24
+- **Intent:** Following the Sprint 1 retro, automate scene wiring and build the whole core loop.
+- **Prompt (key quote):** "I wonder if Unity CLI can setup the scene, create objects and make controller links for me? So, it can save me time." → "lets try hybrid approach".
+- **AI output:** Explained that Unity has no scene CLI, but Editor scripts (menu / `-executeMethod`) can do it, and proposed a split (ADR-0009). Asked 4 planning questions (obstacle hits, invalid clicks, scoring, scope). Wrote 15 runtime scripts + 2 Editor scripts + `config.json` + the guide.
+- **Decisions by User:** bounce off obstacles; invalid = non-target / too far / cooldown; +10 / +5; start the sprint now and stop tracking story points.
+- **Verification (new technique):** the Editor was open, so the AI made an **APFS copy-on-write clone** of the project in /tmp and ran Unity in batch mode there. Compile: 0 errors. Setup run: **found a real bug** (stale prefab reference after `OpenScene` unloaded assets), fixed it, and re-verified. Idempotency check: a second run made 0 changes. HUD path checked after importing TMP Essentials into the clone. Spawn smoke test (throwaway editor method, not committed): 3 × 330 objects, 0 failed, 0 overlapping pairs, 0 out of bounds.
+- **Not verified by AI:** anything that needs Play Mode with input (picking, flight feel, sounds, HUD look). That's the PO's play-test.

@@ -1,5 +1,6 @@
 using System;
 using BoomerangGuardian.Cameras;
+using BoomerangGuardian.Core;
 using UnityEngine;
 
 namespace BoomerangGuardian.Player
@@ -21,7 +22,7 @@ namespace BoomerangGuardian.Player
         [Tooltip("Camera rig whose yaw defines 'forward' for movement.")]
         [SerializeField] private CameraRig cameraRig;
 
-        [Header("Speed (SPACE toggles)")]
+        [Header("Speed (SPACE toggles; overridden by config.json when loaded)")]
         [Tooltip("Normal movement speed in m/s.")]
         [SerializeField, Min(0f)] private float normalSpeed = 5f;
         [Tooltip("Fast movement speed in m/s.")]
@@ -91,6 +92,7 @@ namespace BoomerangGuardian.Player
 
         private void OnEnable()
         {
+            ConfigLoader.Changed += ApplyConfig;
             if (input == null) return;
             input.ToggleSpeedPressed += ToggleSpeed;
             input.JumpPressed += RequestJump;
@@ -98,9 +100,21 @@ namespace BoomerangGuardian.Player
 
         private void OnDisable()
         {
+            ConfigLoader.Changed -= ApplyConfig;
             if (input == null) return;
             input.ToggleSpeedPressed -= ToggleSpeed;
             input.JumpPressed -= RequestJump;
+        }
+
+        private void Start()
+        {
+            if (ConfigLoader.Current != null) ApplyConfig(ConfigLoader.Current);
+        }
+
+        private void ApplyConfig(GameConfig config)
+        {
+            normalSpeed = config.normalSpeed;
+            fastSpeed = config.fastSpeed;
         }
 
         private void FixedUpdate()

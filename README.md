@@ -17,9 +17,13 @@ Unity **6000.3.25f1 LTS** (URP).
 | F | Jump |
 | V | Switch first-person / third-person camera |
 | Mouse wheel | Third-person camera distance |
-| Left click | Select a target → throw the boomerang (3 s cooldown) |
+| Left click | Select a target → throw the boomerang (3 s cooldown, max 40 m) |
 | ESC | Quit |
-| F5 | Reload `config.json` (Sprint 2) |
+| F5 | Reload `config.json` |
+
+## Runtime config (`config.json`)
+The default is in `Assets/StreamingAssets/config.json`. In a build, a `config.json` placed **next to the app** overrides it, and F5 reloads it in game.
+Keys: `respawnMode` (`Regenerate` / `Restore`), `randomSeed`, `targetCount`, `obstacleCount`, `collectibleCount`, `normalSpeed`, `fastSpeed`, `targetScore`, `collectibleScore`, `maxThrowRange`, `boomerangSpeed`, `boomerangCooldown`. Out-of-range values are clamped (200–500 objects, ≥ 100 targets and obstacles).
 
 ## Repository map
 ```

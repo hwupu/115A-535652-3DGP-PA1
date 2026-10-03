@@ -12,3 +12,9 @@ The boomerang is a **kinematic Rigidbody + trigger collider**, moved in `FixedUp
 
 ## Consequences
 Deterministic and stable, which is graded under "overall stability". The impact force on targets is still real physics.
+
+## Amendment (2026-10-03, Sprint 2)
+- **One projectile per throw.** The 3 s cooldown is the only gate (spec: "3 seconds between throws"), even if an earlier boomerang is still returning.
+- **Obstacles:** on contact the boomerang applies a small impulse and returns early (PO decision). **Any un-hit target** touched on the way counts as a hit.
+- **Returning:** ignores all collisions (stability). Turns back if its target disappears (platform) or was hit by another boomerang.
+- The outbound path follows the target's live position, so a pushed target is still reached. Reaching the end of the path counts as a hit even without a trigger contact (guards against tunnelling).
