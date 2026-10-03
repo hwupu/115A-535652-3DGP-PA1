@@ -11,9 +11,13 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 
 - (2026-10-01) For the respawn ambiguity the AI offered A/B options; the PO chose a third way (a runtime config toggle). AI options are a starting point, not the boundary.
 
+- (2026-10-03) AI-written step-by-step Editor guides with exact values let the PO set up the scene first try. Precise, verifiable instructions beat high-level ones.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.
+
+- (2026-10-03) Sprint 1 retro produced a concrete process improvement (automate scene wiring with Editor scripts). The retro is useful even solo.
 
 ## User's self-reflection (to be written by the User)
 - What did I learn?

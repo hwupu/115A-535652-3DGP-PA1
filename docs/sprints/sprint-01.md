@@ -54,7 +54,8 @@
 - Not done / carried over: U5 asset hunt (theme still TBD); delete `SampleScene.unity`.
 - Backlog impact: none. The PO raised a folder-structure question (`_Project` vs. Assets root) before Sprint 2; see Daily log / ADR-0001.
 
-## Retro
-- Keep:
-- Problem:
-- Try:
+## Retro (2026-10-03, PO input)
+- **Keep:** step-by-step Editor guides with exact transforms and a checklist. The PO built the scene on the first attempt with no errors. Batch-mode compile check before hand-off.
+- **Problem:** nothing significant ("everything is perfect"). Manual scene wiring is the slowest part for the PO.
+- **Try:** automate scene/prefab creation and component linking with Unity **Editor scripts** (menu / `-executeMethod`), so the PO's time goes to assets and polish. To be decided at Sprint 2 planning (proposed ADR-0009).
+- **Folder question:** the PO asked whether `Assets/_Project/` is best practice. Answer: yes (separates our content from Asset Store packs that import at the `Assets/` root). Decision: **keep it** (ADR-0001 unchanged).
