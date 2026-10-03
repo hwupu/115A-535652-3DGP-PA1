@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d9d67d3d758540b89b56c1119c96c49, type: 3}
+  m_Name: SpawnConfig
+  m_EditorClassIdentifier: Assembly-CSharp::BoomerangGuardian.Spawning.SpawnConfig
+  targetPrefabs:
+  - {fileID: 3303516806077293277, guid: a1df6d1941d724282b9179850ef88ad1, type: 3}
+  obstaclePrefabs:
+  - {fileID: 3488970785156158910, guid: 538bebcee5f7f4648917e6b54b8d3957, type: 3}
+  - {fileID: 4604737803389149543, guid: 86fa3a5188ab94cc6a98f5f3e028f8be, type: 3}
+  collectiblePrefabs:
+  - {fileID: 3332068550540700822, guid: a47419777a98c4318bef92af1dd8e27e, type: 3}

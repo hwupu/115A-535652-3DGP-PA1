@@ -72,3 +72,7 @@ Template:
 - **Decisions by User:** bounce off obstacles; invalid = non-target / too far / cooldown; +10 / +5; start the sprint now and stop tracking story points.
 - **Verification (new technique):** the Editor was open, so the AI made an **APFS copy-on-write clone** of the project in /tmp and ran Unity in batch mode there. Compile: 0 errors. Setup run: **found a real bug** (stale prefab reference after `OpenScene` unloaded assets), fixed it, and re-verified. Idempotency check: a second run made 0 changes. HUD path checked after importing TMP Essentials into the clone. Spawn smoke test (throwaway editor method, not committed): 3 × 330 objects, 0 failed, 0 overlapping pairs, 0 out of bounds.
 - **Not verified by AI:** anything that needs Play Mode with input (picking, flight feel, sounds, HUD look). That's the PO's play-test.
+
+## 2026-10-03 · #10 · Sprint 2 Review · Sprint 2
+- **PO feedback:** "It is working great". The setup menu and the checklist passed on the first run.
+- **AI action:** committed the setup-generated assets (greybox prefabs, materials, SpawnConfig, scene wiring, TMP Essentials) and closed the Sprint 2 issues via commit. #17 (audio) went back to Sprint 3, since only placeholders exist.

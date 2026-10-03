@@ -16,15 +16,15 @@ Milestone: [Sprint 2 — Core Loop](https://github.com/hwupu/115A-535652-3DGP-PA
 ## Sprint backlog
 | ID | Issue | Item | Status |
 |---|---|---|---|
-| PB-06 | #7 | Ray-cast object picking + invalid handling | ⬜ |
-| PB-07 | #8 | Boomerang throw / curve / return / 3 s cooldown | ⬜ |
-| PB-08 | #9 | Spawn Manager (330 objects, random, in bounds) | ⬜ |
-| PB-09 | #10 | No overlap at spawn | ⬜ |
-| PB-10 | #11 | Hit physics: push, visible 2 s, disappear | ⬜ |
-| PB-12 | #13 | Guardian Platform trigger (hide / respawn) | ⬜ |
-| PB-13 | #14 | Collectibles | ⬜ |
-| PB-14 | #15 | HUD (score, targets, speed/view, cooldown, messages) | ⬜ |
-| PB-24 | #25 | Runtime `config.json` + F5 | ⬜ |
+| PB-06 | #7 | Ray-cast object picking + invalid handling | ✅ |
+| PB-07 | #8 | Boomerang throw / curve / return / 3 s cooldown | ✅ |
+| PB-08 | #9 | Spawn Manager (330 objects, random, in bounds) | ✅ |
+| PB-09 | #10 | No overlap at spawn | ✅ |
+| PB-10 | #11 | Hit physics: push, visible 2 s, disappear | ✅ |
+| PB-12 | #13 | Guardian Platform trigger (hide / respawn) | ✅ |
+| PB-13 | #14 | Collectibles | ✅ |
+| PB-14 | #15 | HUD (score, targets, speed/view, cooldown, messages) | ✅ |
+| PB-24 | #25 | Runtime `config.json` + F5 | ✅ |
 | PB-16 | #17 | *Pulled in partly:* AudioManager + placeholder tones (real clips stay in Sprint 3) | 🟨 |
 
 ## Task breakdown
@@ -38,14 +38,21 @@ Milestone: [Sprint 2 — Core Loop](https://github.com/hwupu/115A-535652-3DGP-PA
 - [x] Guide `docs/guides/sprint-02-setup.md`
 
 **User**
-- [ ] U1 Import TMP Essentials, delete `Obstacles_Test`, run the setup menu
-- [ ] U2 Play-test the checklist, report feel and bugs
-- [ ] U3 (carried over) Asset hunt for the theme; delete `Assets/Scenes/SampleScene.unity`
+- [x] U1 Import TMP Essentials, delete `Obstacles_Test`, run the setup menu
+- [x] U2 Play-test the checklist, report feel and bugs
+- [ ] U3 (carried over **again** to Sprint 3) Asset hunt for the theme; delete `Assets/Scenes/SampleScene.unity`
 
 ## Daily log
 - **2026-10-03**: Planning (decisions above). Claude implemented all code + setup script. Verification without touching the open Editor: cloned the project with APFS copy-on-write into `/tmp`, then batch-compiled → 0 errors. Ran the setup script: found a bug (`OpenScene` unloads the in-memory prefab created earlier in the run, so the reference went stale), fixed it by opening the scene first, and re-ran → OK. A second run made no changes (idempotent). Imported TMP Essentials into the clone, and the HUD path works. Spawn smoke test ×3: 330 objects, 0 failed placements, **0 overlapping pairs**, 0 out of bounds, 4–9 ms. Not yet verified: Play-Mode behaviour (picking, flight, platform, audio, HUD); that needs the PO's play-test.
 
-## Review
+- **2026-10-03 (later)**: The PO imported TMP Essentials, deleted `Obstacles_Test`, ran the setup menu, and play-tested: "It is working great". The PO also captured a sprint-board screenshot for the report (`docs/report/screenshot-of-pa1-sprint-board.png`).
+
+## Review (2026-10-03)
+- **Sprint goal met on day 1 of a 6-day sprint.** The PO confirmed the full core loop in Play Mode.
+- Done: PB-06, 07, 08, 09, 10, 12, 13, 14, 24. PB-16 is partly done (placeholder tones), so #17 moves back to Sprint 3 for the real clips.
+- Carried over: theme / asset hunt; delete `Assets/Scenes/SampleScene.unity`.
+- Traceability: every rubric category except the minimap (Cat. 14) and real SFX (Cat. 15) is now ✅.
+- Observation: the hybrid setup made PO integration take about 10 minutes, against about 45–60 minutes of manual wiring in Sprint 1.
 
 ## Retro
 - Keep:
