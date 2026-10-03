@@ -10,7 +10,7 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 | 2 | **Object organization** — required categories present (ground, boundary, targets, obstacles, player, boomerang, platform) | 2 | PB-01, PB-08 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
 | | logical hierarchy & naming | 2 | PB-01 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
 | 3 | **Player movement** — W/S forward/backward | 3 | PB-02 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
-| | camera-relative movement | 3 | PB-02, PB-26 | 🟨 | **Correction 2026-10-03:** only worked while the camera faced +Z (`PlayerMotor.cameraRig` unlinked since Sprint 1). Fixed in Sprint 4; awaiting PO re-test |
+| | camera-relative movement | 3 | PB-02, PB-26 | ✅ | Corrected 2026-10-03: only worked while the camera faced +Z (`PlayerMotor.cameraRig` unlinked since Sprint 1); fixed + PO re-test in the Sprint 4 Review |
 | | smooth movement | 2 | PB-02 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
 | 4 | **Speed toggle** — SPACE toggles | 2 | PB-03 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |
 | | appropriate speed difference | 2 | PB-03 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review) |

@@ -973,7 +973,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoomerangGuardian.Player.PlayerMotor
   input: {fileID: 201296781}
-  cameraRig: {fileID: 0}
+  cameraRig: {fileID: 1279503755}
   normalSpeed: 5
   fastSpeed: 10
   groundAcceleration: 40

@@ -93,3 +93,7 @@ Template:
 - **AI diagnosis:** the described behaviour was the intended design, so it suspected wiring rather than logic. Parsed the scene YAML with a script and listed every empty object reference on our components: only `PlayerMotor.cameraRig`. Explained the root cause honestly (AI's silent fallback hid a missed manual step for two sprints) and **corrected the traceability record** for "camera-relative movement".
 - **Fix:** auto-find + warning in `PlayerMotor`; `[OptionalReference]` + `WiringValidator` menu (runs after each setup); Sprint 3 setup now links the field. Verified in a clone: the validator flagged exactly one field, and the setup rerun linked only that field.
 - **Guide:** `docs/guides/asset-swap.md` (licensing on a public repo, import/material conversion, Model-container swap, pivot rule, primitive colliders, prefab variants + SpawnConfig, boomerang, Mixamo player, environment rules from the spec, HUD restyle, checks).
+
+## 2026-10-03 · #14 · Sprint 4 Review · Sprint 4
+- **PO feedback:** PB-26 tested and confirmed; "The guide … is all I need"; close Sprint 4; the PO now works on Sprint 5 (art & audio).
+- **AI action:** committed the repaired scene + new .meta files; closed #26, #27 and the Sprint 4 milestone; moved PB-20 (juice) to Sprint 5 pending scope confirmation.
