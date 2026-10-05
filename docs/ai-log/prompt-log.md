@@ -103,3 +103,9 @@ Template:
 - **AI diagnosis (from the prefab YAML the PO attached):** `spinner: {fileID: 0}`. The swap replaced the referenced `Spinner` object. A second, latent bug: the model carries an FBX import rotation (-90, 0, -134), so the old `Rotate(…, Space.Self)` would spin it on the wrong axis even once re-linked.
 - **Fix:** `RotateAround(root position, root up)` (import-rotation independent); auto-fallback + warning; validator extended to prefabs (in a clone it reported exactly `Boomerang.prefab → BoomerangProjectile.spinner`, then ✓ after the fix); re-linked the prefab field (explicit PO request to fix, so a prefab YAML edit was allowed by CLAUDE.md). The guide was updated so the next swap keeps `Spinner`.
 - **Lesson:** the Sprint 4 validator only covered the scene. Model swaps break links inside **prefabs**, so tools must cover the places the next phase of work touches.
+
+## 2026-10-05 · #16 · Halloween theme; ghost hit reaction · Sprint 5 · PB-20, PB-18
+- **PO input:** "it will be halloween theme"; the guide is enough; polish stays open. "I have just changed the model for target to ghost … when boomerang hits, instead of the ghost bounce on ground, it should flow upward and fade away."
+- **AI analysis:** checked the prefab (the ghost is a nested FBX instance with an opaque imported material). Flagged two constraints the PO didn't mention: the **spec** still needs "pushed away", "visible 2 s", "disappears"; and **URP strips unused shader variants in builds**, so a runtime-only transparent switch could fail only in the build.
+- **Output:** `HitReaction` per prefab (Tumble / FloatAway); FloatAway = push + gravity off + rise + upright spin + 2 s alpha/emission fade; `M_TargetFade` template referenced by the prefab so the variant ships; `MaterialUtility`; `Sprint5Setup`; ADR-0010.
+- **Verification:** clone: compile OK; setup idempotent (run 2: 0 changes); prefab/material YAML checked. Visual feel → PO play-test.

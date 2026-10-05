@@ -20,6 +20,8 @@
 - Prefab convention: the root pivot sits at the ground contact (bottom center); visuals go in a `Model` child; root holds Rigidbody/collider/gameplay component.
 - `Assets/StreamingAssets/config.json` (Unity requires it at the Assets root) holds runtime tunables (ADR-0008).
 - Build: menu **Boomerang Guardian → Build → macOS**, or batch `-executeMethod BoomerangGuardian.EditorTools.BuildScript.BuildMacBatch -buildOutput <path>.app` (in a clone if the Editor is open). Output in `Builds/macOS/` (git-ignored) plus an editable `config.json` next to the `.app`. Headless smoke run: `"<app>/Contents/MacOS/Boomerang Guardian" -batchmode -nographics -logFile <log>`.
+- Theme: **Halloween** (ghost targets). Per-prefab target hit reaction `Tumble` / `FloatAway`, with the fade material template `M_TargetFade` keeping transparent variants in builds (ADR-0010, `Setup → Sprint 5`).
+- `WiringValidator` (menu **Validate Wiring**) checks the scene **and** prefabs under `_Project/Prefabs`; mark legitimately empty fields `[OptionalReference]`.
 - Menus/panels pause gameplay via `PlayerInputReader.SetGameplayEnabled(false)` + `Time.timeScale = 0`; ESC and F5 keep working.
 - One MonoBehaviour per file, file name = class name. Use `[SerializeField] private` fields with `[Tooltip]` for tunables. Avoid public fields.
 - Unity 6 APIs: `Rigidbody.linearVelocity` (not `velocity`), `FindObjectsByType`, **Input System package** (no legacy `Input.GetKey`).

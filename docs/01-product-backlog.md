@@ -57,4 +57,6 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | 2026-10-03 | PB-26 facing | After testing: expected = player and movement follow the camera yaw (already the design) → it was a **bug** (missing link), fixed |
 | 2026-10-03 | PB-27 spawn delay | False alarm → closed |
 | 2026-10-03 | PB-22 report | Hold until the PO has finished everything |
-| TBD (Sprint 5) | Theme / models | PO swaps models in Sprint 5 |
+| 2026-10-05 | Theme | **Halloween** (Sketchfab "Halloween graveyard pack", CC-BY); targets are ghosts |
+| 2026-10-05 | Asset credits format | List (attribution lines), not a table |
+| 2026-10-05 | PB-20 juice | The asset-swap guide is enough for the PO; polish stays open and is requested case by case (first: the ghost float-and-fade hit reaction, ADR-0010) |
