@@ -51,7 +51,9 @@ Our prefabs are built as **root (physics + gameplay) → `Model` (looks) + `Mini
 4. Optional: rerun **Boomerang Guardian → Setup → Sprint 3**. It adds a minimap icon to any listed prefab that lacks one; variants already have it.
 
 ## 4. Boomerang
-Open `Prefabs/Greybox/Boomerang.prefab`. Replace the children of **`Spinner`** (Arm_A / Arm_B) with your model, lying **flat** (spin axis = local Y) and about 0.6 m across. Keep the root's Sphere Collider (trigger) and the `BoomerangProjectile` component.
+Open `Prefabs/Greybox/Boomerang.prefab`. **Keep the `Spinner` object** and put your model **inside it** (delete Arm_A / Arm_B), lying flat and about 0.6 m across. Keep the root's Sphere Collider (trigger) and the `BoomerangProjectile` component.
+- The spin is always around the boomerang's vertical axis, so the model's import rotation (e.g. -90° X from Blender) doesn't matter.
+- If you **replace** `Spinner` instead, the root's `BoomerangProjectile → Spinner` field becomes empty and nothing spins. Drag the new object into that field. **Validate Wiring** reports this, since it also checks prefabs.
 
 ## 5. Player character (e.g. Mixamo)
 1. On `Gameplay/Player`, **untick the Mesh Renderer** (keep the Capsule Collider, Rigidbody and scripts). Delete or disable `Nose`.

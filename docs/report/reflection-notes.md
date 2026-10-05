@@ -21,6 +21,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 
 - (2026-10-03) **AI-introduced risk:** a "helpful" silent fallback in AI-written code hid a missed manual wiring step for two sprints, and a checklist item was marked as passed. Lesson: AI code should fail loudly, and verification should be automated where possible (wiring validator) rather than relying only on manual checklists.
 
+- (2026-10-05) The AI's guide said to "replace the children of Spinner", but the PO's natural workflow replaced Spinner itself. Guides need to anticipate how a human actually works in the Editor, and code should be robust to it (import rotations, lost links).
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.

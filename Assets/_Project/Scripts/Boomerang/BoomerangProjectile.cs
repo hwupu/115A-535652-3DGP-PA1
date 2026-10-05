@@ -23,7 +23,7 @@ namespace BoomerangGuardian.Boomerang
         }
 
         [Header("Visual")]
-        [Tooltip("Child that spins (visual only).")]
+        [Tooltip("Visual child that spins around the boomerang's vertical axis. Any import rotation is fine.")]
         [SerializeField] private Transform spinner;
         [Tooltip("Spin speed in degrees per second.")]
         [SerializeField] private float spinSpeed = 1080f;
@@ -76,6 +76,16 @@ namespace BoomerangGuardian.Boomerang
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             foreach (Collider c in GetComponentsInChildren<Collider>()) c.isTrigger = true;
+
+            if (spinner == null)
+            {
+                // Fail loudly (ADR-0009): e.g. the link is lost when a model swap replaces the Spinner object.
+                Renderer visual = GetComponentInChildren<Renderer>();
+                spinner = visual != null && visual.transform != transform ? visual.transform : null;
+                Debug.LogWarning($"{nameof(BoomerangProjectile)}: 'Spinner' is not assigned on the {name} prefab; " +
+                                 (spinner != null ? $"spinning '{spinner.name}' instead. " : "nothing will spin. ") +
+                                 "Assign it in the prefab (Boomerang Guardian → Validate Wiring lists such gaps).", this);
+            }
         }
 
         public void Launch(BoomerangThrower thrower, Target selectedTarget, float throwSpeed)
@@ -98,7 +108,9 @@ namespace BoomerangGuardian.Boomerang
 
         private void Update()
         {
-            if (spinner != null) spinner.Rotate(0f, spinSpeed * Time.deltaTime, 0f, Space.Self);
+            // Spin around the boomerang's own vertical axis through its center, independent of the
+            // model's import rotation (FBX models often carry e.g. -90° X), so it always spins flat.
+            if (spinner != null) spinner.RotateAround(transform.position, transform.up, spinSpeed * Time.deltaTime);
         }
 
         private void FixedUpdate()

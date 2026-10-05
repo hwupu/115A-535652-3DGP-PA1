@@ -22,6 +22,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 ## Daily log
 - **2026-10-03**: Sprint 4 closed; the PO starts the theme / asset work.
 
+- **2026-10-05**: The PO imported the Sketchfab "Boomerang" (CC-BY) into `Assets/_Project/Models/Boomerang/` and swapped it into `Boomerang.prefab`; credits added (list format, PO preference). **Bug:** the boomerang didn't spin. Cause: the swap replaced the `Spinner` object, so `BoomerangProjectile.spinner` became empty. Also latent: the code spun around the visual's *local* Y, which would tumble an FBX imported with a -90° X rotation. Fix: spin via `RotateAround(root center, root up)`; empty link → auto-use the first visual child + warning; `WiringValidator` now also scans prefabs (verified: it flagged exactly this field); prefab re-linked at the PO's request. The asset-swap guide §4 is updated.
+
 ## Review
 
 ## Retro
