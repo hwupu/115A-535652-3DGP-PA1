@@ -109,3 +109,7 @@ Template:
 - **AI analysis:** checked the prefab (the ghost is a nested FBX instance with an opaque imported material). Flagged two constraints the PO didn't mention: the **spec** still needs "pushed away", "visible 2 s", "disappears"; and **URP strips unused shader variants in builds**, so a runtime-only transparent switch could fail only in the build.
 - **Output:** `HitReaction` per prefab (Tumble / FloatAway); FloatAway = push + gravity off + rise + upright spin + 2 s alpha/emission fade; `M_TargetFade` template referenced by the prefab so the variant ships; `MaterialUtility`; `Sprint5Setup`; ADR-0010.
 - **Verification:** clone: compile OK; setup idempotent (run 2: 0 changes); prefab/material YAML checked. Visual feel → PO play-test.
+
+## 2026-10-05 · #17 · Ghost confirmed; prefab rename · Sprint 5 · PB-20
+- **PO input:** "it is looking good. change to Target_Ghost".
+- **AI action:** renamed the prefab and its `.meta` together (GUID preserved → SpawnConfig and scene links intact), updated the root object name, and changed `Sprint2Setup`'s prefab name so an idempotent rerun doesn't recreate the old file. Living guide updated; historical sprint guides left as they were.

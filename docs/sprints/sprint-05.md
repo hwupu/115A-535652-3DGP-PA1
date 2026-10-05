@@ -26,6 +26,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 
 - **2026-10-05 (later)**: PO decisions: Halloween theme; PB-20 stays open as requested polish. First request: ghosts (new target model in `Target_Barrel`) should "flow upward and fade away" when hit instead of bouncing. Implemented `Target` Hit Reaction (Tumble / FloatAway), `Core/MaterialUtility`, `Editor/Sprint5Setup` (creates `M_TargetFade`, links it, sets FloatAway). Verified in a clone: compile OK; setup run 1 created/linked; run 2 made 0 changes; prefab shows `hitReaction: 1` + template; the material has `_SURFACE_TYPE_TRANSPARENT`. Not verifiable by AI: the look of the float and fade → PO play-test.
 
+- **2026-10-05 (later)**: The PO confirmed the ghost float-and-fade ("it is looking good"). Prefab renamed `Target_Barrel` → `Target_Ghost` at the PO's request (`git mv` with `.meta`, so the GUID and all links are kept; root name updated; `Sprint2Setup` updated so a rerun can't recreate a stray `Target_Barrel`).
+
 ## Review
 
 ## Retro

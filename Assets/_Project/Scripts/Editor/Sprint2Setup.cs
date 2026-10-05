@@ -67,7 +67,8 @@ namespace BoomerangGuardian.EditorTools
             Material mCollectible = u.GetOrCreateMaterial("M_Collectible", new Color(1f, 0.82f, 0.2f));
             Material mBoomerang = u.GetOrCreateMaterial("M_Boomerang", new Color(0.95f, 0.55f, 0.15f));
 
-            Target targetPrefab = GetOrCreatePrefab<Target>(u, "Target_Barrel", root =>
+            // Named after the Halloween theme (PO 2026-10-05); a fresh project gets a greybox barrel shape under this name.
+            Target targetPrefab = GetOrCreatePrefab<Target>(u, "Target_Ghost", root =>
             {
                 AddRigidbody(root, 2f);
                 var col = root.AddComponent<CapsuleCollider>();

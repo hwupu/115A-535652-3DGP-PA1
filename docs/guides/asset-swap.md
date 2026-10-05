@@ -21,10 +21,10 @@ For Sprint 5 (art & audio). Everything here is done in the Unity Editor; **no co
    - **Materials** tab: **Extract Materials…** into the same folder, so you can edit them.
 3. **Pink materials?** The pack uses the Built-in pipeline. Run **Window → Rendering → Render Pipeline Converter → Built-in to URP → Material Upgrade → Initialize And Convert**, or set each material's shader to **Universal Render Pipeline/Lit**.
 
-## 2. Replace the look of an existing prefab (e.g. the target barrel)
+## 2. Replace the look of an existing prefab (e.g. the target)
 Our prefabs are built as **root (physics + gameplay) → `Model` (looks) + `MinimapIcon` (map)**. You only change `Model`.
 
-1. Double-click `Assets/_Project/Prefabs/Greybox/Target_Barrel.prefab` to open Prefab Mode.
+1. Double-click `Assets/_Project/Prefabs/Greybox/Target_Ghost.prefab` (formerly `Target_Barrel`) to open Prefab Mode.
 2. Select the **`Model`** child. In the Inspector, **remove its Mesh Filter and Mesh Renderer** (⋮ → Remove Component). `Model` is now an empty container. Keeping it preserves references to it (e.g. the gem's spin uses `Model`).
    - Delete any other greybox-only children (the barrel's `Band`).
    - **Don't touch** `MinimapIcon`.
@@ -44,7 +44,7 @@ Our prefabs are built as **root (physics + gameplay) → `Model` (looks) + `Mini
 ## 3. Add variants (several barrels, rocks, crates…)
 1. Right-click the base prefab (e.g. `Obstacle_Crate`) → **Create → Prefab Variant**, and name it e.g. `Obstacle_Rock_A`.
    - A variant keeps all components and the minimap icon, and only overrides what you change.
-   - Use a variant of the **closest** base: target → `Target_Barrel`, obstacle → `Obstacle_Crate` / `Obstacle_Pillar`, gem → `Collectible_Gem`.
+   - Use a variant of the **closest** base: target → `Target_Ghost`, obstacle → `Obstacle_Crate` / `Obstacle_Pillar`, gem → `Collectible_Gem`.
 2. Open the variant and do **section 2** steps 2–6 with a different model.
 3. Open `Assets/_Project/Settings/SpawnConfig.asset` and add the variant to **Target / Obstacle / Collectible Prefabs** (the + button). The spawner picks one at random for each object.
    - Remove the greybox prefab from the list if you no longer want it to appear.

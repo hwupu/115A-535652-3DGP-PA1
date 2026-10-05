@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5690622332283371806}
   - component: {fileID: 3303516806077293277}
   m_Layer: 0
-  m_Name: Target_Barrel
+  m_Name: Target_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,6 +100,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoomerangGuardian.Interaction.Target
   disappearDelay: 2
   hitTint: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+  hitReaction: 1
+  riseAcceleration: 3
+  floatDrag: 1.5
+  floatSpin: 240
+  fadeMaterialTemplate: {fileID: 2100000, guid: 7b80ed944561e45eaa852ca4f44cab0c, type: 2}
 --- !u!1 &1129093760882210350
 GameObject:
   m_ObjectHideFlags: 0
