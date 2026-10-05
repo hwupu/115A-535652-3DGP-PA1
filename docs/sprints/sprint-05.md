@@ -28,6 +28,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 
 - **2026-10-05 (later)**: The PO confirmed the ghost float-and-fade ("it is looking good"). Prefab renamed `Target_Barrel` → `Target_Ghost` at the PO's request (`git mv` with `.meta`, so the GUID and all links are kept; root name updated; `Sprint2Setup` updated so a rerun can't recreate a stray `Target_Barrel`).
 
+- **2026-10-05 (later)**: The PO swapped the gem for a **pumpkin** (Halloween pack); it stopped bobbing. Same cause as the boomerang: the swap replaced `Model`, so `Collectible.visual` was empty. Fix: loud fallback (first visual child + warning); `visual` is now a required field (the validator checks it); new **Visual Motion** `Spin` / `FacePlayer`. FacePlayer applies a world yaw toward the player on top of the authored import rotation, independent of the spawner's random root yaw. Prefab linked + set to FacePlayer at the PO's request. Clone test: validator ✓; with the root at yaw 137°, the angle between the pumpkin's front and the player = **0.00°**. The PO also added tombstone/ground models, a lighting bake, and a skybox pack (Asset Store? held back from the public repo pending the license).
+
 ## Review
 
 ## Retro

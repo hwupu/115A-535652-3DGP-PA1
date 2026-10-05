@@ -23,6 +23,8 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 
 - (2026-10-05) The AI's guide said to "replace the children of Spinner", but the PO's natural workflow replaced Spinner itself. Guides need to anticipate how a human actually works in the Editor, and code should be robust to it (import rotations, lost links).
 
+- (2026-10-05) Recurring pattern: every model swap so far (boomerang, pumpkin) broke a reference to the replaced child. AI-built tooling (validator, loud fallbacks) turned a confusing "it doesn't move" into a one-line diagnosis. But one field was wrongly marked optional by the AI, which hid the second case from the validator. Tool rules need review too.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.

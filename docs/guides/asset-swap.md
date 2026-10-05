@@ -28,6 +28,7 @@ Our prefabs are built as **root (physics + gameplay) → `Model` (looks) + `Mini
 2. Select the **`Model`** child. In the Inspector, **remove its Mesh Filter and Mesh Renderer** (⋮ → Remove Component). `Model` is now an empty container. Keeping it preserves references to it (e.g. the gem's spin uses `Model`).
    - Delete any other greybox-only children (the barrel's `Band`).
    - **Don't touch** `MinimapIcon`.
+   - If you replace `Model` itself instead, re-link the field that pointed to it (gem: `Collectible → Visual`; boomerang: `BoomerangProjectile → Spinner`). **Validate Wiring** lists it, and at runtime a warning names the fallback.
 3. Drag your imported model **onto `Model`** to make it a child. Then:
    - Set its Position to (0, 0, 0) first. Then adjust it so the **bottom of the model sits at y = 0** and it's centered on X/Z. **Pivot = bottom center** is the spawner's rule (ADR-0006).
    - Scale and rotate until it matches the old size (barrel ≈ 0.8 × 1.2 m, crate 1.2 m, pillar 1 × 2 m, gem ≈ 0.4 m at 0.9 m height).
@@ -49,6 +50,9 @@ Our prefabs are built as **root (physics + gameplay) → `Model` (looks) + `Mini
 3. Open `Assets/_Project/Settings/SpawnConfig.asset` and add the variant to **Target / Obstacle / Collectible Prefabs** (the + button). The spawner picks one at random for each object.
    - Remove the greybox prefab from the list if you no longer want it to appear.
 4. Optional: rerun **Boomerang Guardian → Setup → Sprint 3**. It adds a minimap icon to any listed prefab that lacks one; variants already have it.
+
+### Collectible motion
+`Collectible → Visual Motion`: **Spin** (gems) or **FacePlayer**. FacePlayer keeps the model's front, the prefab's **+Z** (blue arrow in Prefab Mode with the pivot set to Local), turned toward the player. So in Prefab Mode, rotate the model until its face points along +Z. Both modes bob up and down (Bob Height / Bob Frequency).
 
 ## 4. Boomerang
 Open `Prefabs/Greybox/Boomerang.prefab`. **Keep the `Spinner` object** and put your model **inside it** (delete Arm_A / Arm_B), lying flat and about 0.6 m across. Keep the root's Sphere Collider (trigger) and the `BoomerangProjectile` component.

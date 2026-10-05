@@ -113,3 +113,9 @@ Template:
 ## 2026-10-05 · #17 · Ghost confirmed; prefab rename · Sprint 5 · PB-20
 - **PO input:** "it is looking good. change to Target_Ghost".
 - **AI action:** renamed the prefab and its `.meta` together (GUID preserved → SpawnConfig and scene links intact), updated the root object name, and changed `Sprint2Setup`'s prefab name so an idempotent rerun doesn't recreate the old file. Living guide updated; historical sprint guides left as they were.
+
+## 2026-10-05 · #18 · Pumpkin collectible: bob + face the player · Sprint 5 · PB-18, PB-20
+- **PO input:** "I have changed the gem to pumpkin model, but it is not moving up and down now… it is fine to keep the name as gem in the code. Also, can you make the pumpkin face player at all time (z axis)?"
+- **AI diagnosis:** prefab YAML showed `visual: {fileID: 0}`, the same failure mode as the boomerang Spinner (a model swap replaces the referenced child). `visual` had been marked `[OptionalReference]`, so the validator didn't flag it: an AI mistake in classifying the field, now corrected (required + runtime fallback).
+- **Output:** `VisualMotion` Spin / FacePlayer; yaw-only facing that preserves the import rotation; prefab linked. Headless math test: 0.00° error with a random root yaw.
+- **Process catch:** the AI noticed a likely **Asset Store** skybox pack among the new files and held it back from the public repo, asking the PO instead of committing everything.
