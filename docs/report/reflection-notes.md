@@ -25,6 +25,9 @@ Report outline (1–2 pages, ≥ 500 words): 1) Use of AI tools · 2) Adoption o
 
 - (2026-10-05) Recurring pattern: every model swap so far (boomerang, pumpkin) broke a reference to the replaced child. AI-built tooling (validator, loud fallbacks) turned a confusing "it doesn't move" into a one-line diagnosis. But one field was wrongly marked optional by the AI, which hid the second case from the validator. Tool rules need review too.
 
+- (2026-10-05) **Multi-agent handoff:** a different AI agent animated the witch in Blender and wrote a handoff doc that marked its own unverified assumptions. This AI tested those claims on a headless import first; most held, one didn't (height). Explicit "[unverified]" markers plus automated checks made agent-to-agent collaboration safe.
+- (2026-10-05) The PO cut scope mid-task ("simple, glitches OK"). With a deadline, "good enough and documented" beat a perfect animation system. ADR-0011 lists the accepted glitches, so they are conscious trade-offs, not bugs.
+
 ## Scrum — observations
 - (2026-10-01) Solo Scrum: one person holds the PO role, and the AI acts as Scrum Master, keeping artifacts honest (backlog, DoD, sprint files).
 - (2026-10-01) Requirements kept emerging mid-sprint (Unity root location, Git LFS). These were small and absorbed into Sprint 0, which shows why the backlog is a living document.

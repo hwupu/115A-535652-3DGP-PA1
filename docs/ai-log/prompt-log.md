@@ -123,3 +123,10 @@ Template:
 ## 2026-10-05 · #19 · Asset Store licensing; PB-18 closed · Sprint 5
 - **PO input:** the skybox is from the Unity Asset Store; PB-18 accepted; remaining PB-16, PB-20, PB-22.
 - **AI action:** git-ignored the pack (public repo vs. Standard EULA), documented re-import in the README, added a credits entry. The AI did **not** guess the publisher name and left a placeholder for the PO to fill in from the store page. Closed #19.
+
+## 2026-10-05 · #20 · Animated player from a cross-agent handoff · Sprint 5 · PB-28
+- **PO input:** keep the original intro wording; "I'll need a new ticket for the player model. It includes animation, and I have a handoff doc from another AI agent." Mid-way: "I want to keep implementation simple. It is okay to have glitches."
+- **AI action (SM first):** created PB-28 / #29. Then, before writing any code, **verified the other agent's handoff claims headless** (its §8 checklist, by importing into a clone and sampling bones): 5 clips and lengths ✓, faces +Z ✓, hand.R ✓, Release pose ✓, hip rise ✓; height 1.33 m vs. the claimed 1.07 m ✗ (minor).
+- **Scope change by the PO** mid-task: dropped the handoff's richer suggestions (animation events, upper-body mask, speed matching, split jump clips) for a minimal blend tree + triggers. Accepted glitches documented in ADR-0011.
+- **Verification:** clone setup ×2 (idempotent), wiring ✓, macOS build, headless run with no exceptions.
+- **Note for the report:** a multi-agent workflow. A Blender-side AI produced assets plus a handoff doc; this AI verified it against the real import before trusting it.

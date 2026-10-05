@@ -34,6 +34,7 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | PB-25 | [#26](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/26) | As the designer I can **swap / vary models and restyle the HUD** | Guide: replace a prefab's `Model` child, fix the collider, create variants and add them to `SpawnConfig`, restyle `UI/HUD`; setup scripts keep working | quality | Should | – | 4 | ✅ |
 | PB-26 | [#27](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/27) | **Player facing** while the camera rotates (investigate) | PO tests first, then chooses: keep (face camera yaw) / face movement direction / face camera only when moving | quality | Could | – | 4 | ✅ |
 | PB-27 | [#28](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/28) | **Perceived spawn delay** (investigate) → loading overlay if needed | PO describes when the delay happens; add timing logs; fix the cause (Editor domain reload vs. respawn hitch vs. first frame); loading overlay if useful | quality | Could | – | 4 | ❌ |
+| PB-28 | [#29](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/29) | As a player I control an **animated witch** | Witch model replaces the capsule visuals; Idle/Walk/Run by speed; Jump/Throw clips; hidden in FP; physics unchanged; simple, glitches accepted (ADR-0011) | quality | Should | – | 5 | 🟨 |
 | PB-23 | [#24](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/24) | Pause menu / restart | — | — | Won't | – | – | ❌ |
 
 **Must total ≈ 52.5 SP.**
@@ -60,5 +61,7 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | 2026-10-05 | Theme | **Halloween** (Sketchfab "Halloween graveyard pack", CC-BY); targets are ghosts |
 | 2026-10-05 | Asset credits format | List (attribution lines), not a table |
 | 2026-10-05 | Asset Store skybox | Git-ignored (Standard EULA vs. public repo); kept locally and in the submission zip; README explains how to re-import |
+| 2026-10-05 | Intro text | Keep the assignment's original wording (no Halloween rewrite) |
+| 2026-10-05 | Player character (PB-28) | Little Witch with Blender animations from another AI agent's handoff; **keep it simple, glitches are OK** (ADR-0011) |
 | 2026-10-05 | PB-18 asset integration | Accepted by the PO (boomerang, ghost targets, pumpkin collectibles, tombstone/ground, skybox, lighting) |
 | 2026-10-05 | PB-20 juice | The asset-swap guide is enough for the PO; polish stays open and is requested case by case (first: the ghost float-and-fade hit reaction, ADR-0010) |

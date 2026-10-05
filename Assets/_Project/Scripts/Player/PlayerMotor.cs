@@ -50,6 +50,19 @@ namespace BoomerangGuardian.Player
 
         /// <summary>Raised when SPACE toggles the speed mode. Argument: true = fast.</summary>
         public event Action<bool> SpeedModeChanged;
+        /// <summary>Raised when a jump actually starts (used by the animator).</summary>
+        public event Action Jumped;
+
+        /// <summary>Current speed over the ground in m/s (used by the animator).</summary>
+        public float HorizontalSpeed
+        {
+            get
+            {
+                if (body == null) return 0f;
+                Vector3 v = body.linearVelocity;
+                return new Vector2(v.x, v.z).magnitude;
+            }
+        }
 
         public bool IsFast { get; private set; }
         public bool IsGrounded { get; private set; }
@@ -167,6 +180,7 @@ namespace BoomerangGuardian.Player
             jumpRequestTime = float.NegativeInfinity;
             groundLockUntil = Time.time + JumpGroundLockTime;   // avoid re-jumping while still touching the ground
             IsGrounded = false;
+            Jumped?.Invoke();
         }
 
         private bool CheckGrounded()

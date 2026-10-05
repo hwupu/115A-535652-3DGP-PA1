@@ -6,6 +6,9 @@ Every third-party asset must be listed here, with a license that allows use in t
 
 - "Halloween graveyard pack" (https://skfb.ly/pr9W6) by rudolfs is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
 - "Boomerang" (https://skfb.ly/6tvtu) by Muhammad Ari Kurniawan is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+- "The little Witch" (https://skfb.ly/oQxwO) by Antropik is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+  - Rig and the five animation clips (Idle, Walk, Run, Jump, ThrowBoomerang) were made by the PO in Blender with help from an AI agent (see `reference/Unity_Animation_Handoff.md`).
 
 ## Skybox
 - "Free Stylized Hand-Painted Skybox" from the Unity Asset Store, under the Unity Asset Store Standard EULA. Used for the `Midnight` skybox. Not in the public repo (git-ignored), but included in the submission zip. _(Publisher name / URL: to fill in from the Asset Store page.)_
