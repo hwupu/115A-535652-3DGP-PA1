@@ -28,6 +28,13 @@ crashlytics-build.properties
 *.mdb.meta
 
 # =========================================================
+# Unity Asset Store packs: the Standard EULA forbids publishing them in a
+# public repo. They stay local and go into the submission zip (see README).
+# =========================================================
+/[Aa]ssets/Free Stylized Hand-Painted Skybox/
+/[Aa]ssets/Free Stylized Hand-Painted Skybox.meta
+
+# =========================================================
 # Unity builds (never commit; zip separately for submission)
 # =========================================================
 /[Bb]uild/
@@ -73,7 +80,8 @@ ExportedObj/
 .AppleDouble
 .LSOverride
 # macOS custom-folder icon file is named "Icon\r"; matched exactly (a plain `Icon?` would also ignore folders like `Icons/`)
-Icon
+Icon
+
 ._*
 .DocumentRevisions-V100
 .fseventsd

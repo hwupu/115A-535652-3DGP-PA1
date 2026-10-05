@@ -7,7 +7,7 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 ## Sprint backlog
 | ID | Issue | Item | Owner | Status |
 |---|---|---|---|---|
-| PB-18 | #19 | Theme + asset integration (follow `docs/guides/asset-swap.md`) | User | ⬜ |
+| PB-18 | #19 | Theme + asset integration (follow `docs/guides/asset-swap.md`) | User | ✅ |
 | PB-16 | #17 | Real SFX for the 5 required events (+ collect / catch optional) | User finds, Claude wires if needed | ⬜ |
 | PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); more as the PO asks | Claude | 🟨 |
 | PB-21 | (#22 reopened if needed) | Final build + full rubric pass with final art | Both | ⬜ |
@@ -29,6 +29,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 - **2026-10-05 (later)**: The PO confirmed the ghost float-and-fade ("it is looking good"). Prefab renamed `Target_Barrel` → `Target_Ghost` at the PO's request (`git mv` with `.meta`, so the GUID and all links are kept; root name updated; `Sprint2Setup` updated so a rerun can't recreate a stray `Target_Barrel`).
 
 - **2026-10-05 (later)**: The PO swapped the gem for a **pumpkin** (Halloween pack); it stopped bobbing. Same cause as the boomerang: the swap replaced `Model`, so `Collectible.visual` was empty. Fix: loud fallback (first visual child + warning); `visual` is now a required field (the validator checks it); new **Visual Motion** `Spin` / `FacePlayer`. FacePlayer applies a world yaw toward the player on top of the authored import rotation, independent of the spawner's random root yaw. Prefab linked + set to FacePlayer at the PO's request. Clone test: validator ✓; with the root at yaw 137°, the angle between the pumpkin's front and the player = **0.00°**. The PO also added tombstone/ground models, a lighting bake, and a skybox pack (Asset Store? held back from the public repo pending the license).
+
+- **2026-10-05 (later)**: The PO confirmed the skybox is from the Unity Asset Store → git-ignored, with a README re-import note and a credits entry. The PO accepted and closed PB-18. Remaining: PB-16 (SFX), PB-20 (polish on request), PB-22 (report, when the PO asks), plus the final build + rubric pass (PB-21 repeat).
 
 ## Review
 

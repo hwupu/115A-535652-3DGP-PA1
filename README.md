@@ -7,6 +7,12 @@ Unity **6000.3.25f1 LTS** (URP).
 1. Unity Hub → **Add → Add project from disk** → select this folder.
 2. Open `Assets/_Project/Scenes/Main.unity` and press Play.
 
+## Third-party packs not in this repo
+Unity Asset Store assets can't be published in a public repo, so they are git-ignored. They are included in the submitted zip. To rebuild from a fresh clone, import them via **Window → Package Manager → My Assets**:
+- **Free Stylized Hand-Painted Skybox** (Unity Asset Store), imported to `Assets/Free Stylized Hand-Painted Skybox/`. The scene uses its `Midnight` material as the skybox (without it, Unity shows the default sky).
+
+All asset credits: `docs/asset-credits.md`.
+
 ## Build
 **Boomerang Guardian → Build → macOS** → `Builds/macOS/BoomerangGuardian.app`, with an editable `config.json` next to it.
 

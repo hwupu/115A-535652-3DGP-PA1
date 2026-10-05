@@ -119,3 +119,7 @@ Template:
 - **AI diagnosis:** prefab YAML showed `visual: {fileID: 0}`, the same failure mode as the boomerang Spinner (a model swap replaces the referenced child). `visual` had been marked `[OptionalReference]`, so the validator didn't flag it: an AI mistake in classifying the field, now corrected (required + runtime fallback).
 - **Output:** `VisualMotion` Spin / FacePlayer; yaw-only facing that preserves the import rotation; prefab linked. Headless math test: 0.00° error with a random root yaw.
 - **Process catch:** the AI noticed a likely **Asset Store** skybox pack among the new files and held it back from the public repo, asking the PO instead of committing everything.
+
+## 2026-10-05 · #19 · Asset Store licensing; PB-18 closed · Sprint 5
+- **PO input:** the skybox is from the Unity Asset Store; PB-18 accepted; remaining PB-16, PB-20, PB-22.
+- **AI action:** git-ignored the pack (public repo vs. Standard EULA), documented re-import in the README, added a credits entry. The AI did **not** guess the publisher name and left a placeholder for the PO to fill in from the store page. Closed #19.
