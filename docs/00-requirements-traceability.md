@@ -46,7 +46,7 @@ Source: `reference/3DGP_PA_01_Instruction.pdf`. Status values: ⬜ todo · 🟨 
 | 14 | **UI** — score display | 2 | PB-14 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
 | | score updates correctly | 1 | PB-14 | ✅ | PO play-test 2026-10-03 (Sprint 2 Review); spawn log: 330 objects, 0 overlapping pairs |
 | | functional minimap (upper-right) | 2 | PB-15 | ✅ | PO play-test 2026-10-03 (Sprint 3 Review) |
-| 15 | **Audio & control** — 5 SFX (throw, hit, invalid, enter platform, leave platform) | 3 | PB-16 | 🟨 | placeholder tones play for all 5 events; real clips in Sprint 3 |
+| 15 | **Audio & control** — 5 SFX (throw, hit, invalid, enter platform, leave platform) | 3 | PB-16 | ✅ | real CC0 clips for all 5 events + BGM (Sprint 5, PO play-test 2026-10-06) |
 | | ESC quits | 1 | PB-17 | ✅ | PO play-test 2026-10-03 (Sprint 1 Review); ESC confirmed in the macOS build (Sprint 3 Review) |
 | | **Total** | **100** | | | |
 | B | **Report PDF** (1–2 pages, ≥ 500 words, AI usage, Scrum, reflection, asset credits) | +10 / −10 | PB-22 | ⬜ | |

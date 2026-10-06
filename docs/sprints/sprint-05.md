@@ -8,7 +8,7 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 | ID | Issue | Item | Owner | Status |
 |---|---|---|---|---|
 | PB-18 | #19 | Theme + asset integration (follow `docs/guides/asset-swap.md`) | User | ✅ |
-| PB-16 | #17 | Real SFX for the 5 required events (+ collect / catch optional) | User finds, Claude wires if needed | ⬜ |
+| PB-16 | #17 | Real SFX for the 5 required events (+ collect / catch optional) | User finds, Claude wires if needed | ✅ |
 | PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); more as the PO asks | Claude | 🟨 |
 | PB-28 | #29 | Animated player character (Little Witch), simple (ADR-0011) | Claude setup, User checks | ✅ |
 | PB-21 | (#22 reopened if needed) | Final build + full rubric pass with final art | Both | ⬜ |

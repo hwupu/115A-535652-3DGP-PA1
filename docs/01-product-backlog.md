@@ -23,7 +23,7 @@ This file is the source of truth. GitHub mirrors it: Issues + Milestones (one pe
 | PB-13 | [#14](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/14) | **Collectibles** | Trigger pickup → disappears, bonus score, SFX | 3 | Must | 1 | 2 | ✅ |
 | PB-14 | [#15](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/15) | **HUD score** | Always visible; updates on hit/collect; also shows targets hit, speed mode, cooldown | 3 | Must | 2 | 2 | ✅ |
 | PB-15 | [#16](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/16) | **Minimap** upper-right | Shows the player (with heading) + nearby targets / obstacles / collectibles / platform in distinct colors; follows the player | 2 | Must | 3 | 3 | ✅ |
-| PB-16 | [#17](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/17) | **Audio**: 5 required SFX | Throw, hit, invalid selection, enter platform, leave platform (+ optional collect, BGM); AudioManager | 3 | Must | 2 | 5 | 🟨 |
+| PB-16 | [#17](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/17) | **Audio**: 5 required SFX | Throw, hit, invalid selection, enter platform, leave platform (+ optional collect, BGM); AudioManager | 3 | Must | 2 | 5 | ✅ |
 | PB-17 | [#18](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/18) | **ESC quits** | `Application.Quit()`; stops Play Mode in the Editor | 1 | Must | 0.5 | 1 | ✅ |
 | PB-18 | [#19](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/19) | **Asset integration** (User) | Greybox swapped for theme assets; colliders/scale fixed; credits recorded | quality | Should | 3 | 5 | ✅ |
 | PB-19 | [#20](https://github.com/hwupu/115A-535652-3DGP-PA1/issues/20) | **Hero's Journey framing** | Intro panel with story + controls; "Balance Restored" message when all targets are cleared | quality | Should | 2 | 3 | ✅ |
