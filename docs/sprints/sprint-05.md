@@ -9,9 +9,9 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 |---|---|---|---|---|
 | PB-18 | #19 | Theme + asset integration (follow `docs/guides/asset-swap.md`) | User | ✅ |
 | PB-16 | #17 | Real SFX for the 5 required events (+ collect / catch optional) | User finds, Claude wires if needed | ✅ |
-| PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); ghosts drift + spin (IdleWander) | Claude | 🟨 |
+| PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); ghosts drift + spin (IdleWander) | Claude | ✅ |
 | PB-28 | #29 | Animated player character (Little Witch), simple (ADR-0011) | Claude setup, User checks | ✅ |
-| PB-29 | #30 | Hover trajectory preview (ray casting) | Claude | 🟨 |
+| PB-29 | #30 | Hover trajectory preview (ray casting) | Claude | ✅ |
 | PB-30 | #31 | MMB orbit camera preview (demo mode) | Claude | ✅ |
 | PB-21 | (#22 reopened if needed) | Final build + full rubric pass with final art | Both | ⬜ |
 | PB-22 | #23 | Report PDF: **on hold until the PO asks** | Claude drafts, User reflects | ⬜ |
@@ -49,6 +49,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 - **2026-10-06 (later)**: PB-16 closed (PO). New: PB-20 ghost wander; tickets PB-29 (#30) hover trajectory preview and PB-30 (#31) MMB orbit. Implementation: `TargetSelector.Evaluate` (shared by click and hover), `BoomerangProjectile.ControlPoint/Bezier` public (the preview draws the exact flight curve), `TrajectoryPreview` (LineRenderer, Sprites/Default, 50 % green/red), `IdleWander` (Perlin drift + bob + random spin, visual only), CameraRig orbit offsets (gameplay yaw untouched, SmoothDamp return), `OrbitHold` input on MMB. `Sprint5Setup` extended (now opens the scene first). Clone: setup run 1 OK, run 2 = 0 changes, wiring ✓, build + headless run without exceptions, spawn 330 / 0 failed / 0 overlaps.
 
 - **2026-10-06 (later)**: The PO accepted the ghost wander, preview and orbit ("looking great"). Change request: the preview is **always white at 25 % opacity**, so it must not reveal valid/invalid → one `color` field replaces valid/invalid (the old serialized values can't override it). The PO asked how to get distance blur / fog / a midnight feel → `docs/guides/midnight-look.md` (moonlight, ambient, fog, Global Volume with Depth of Field Gaussian + Bloom + grading, optional lights). Pre-emptive fix: fog is global, so the minimap camera disables fog for its own render (RenderPipelineManager callbacks). Clone compile OK.
+
+- **2026-10-06 (later)**: The PO closed PB-20 and PB-29 and asked for the report (PB-22).
 
 ## Review
 
