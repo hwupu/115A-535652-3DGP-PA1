@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6251611208829983709}
   - component: {fileID: 5690622332283371806}
   - component: {fileID: 3303516806077293277}
+  - component: {fileID: 8265461152241135291}
   m_Layer: 0
   m_Name: Target_Ghost
   m_TagString: Untagged
@@ -105,6 +106,23 @@ MonoBehaviour:
   floatDrag: 1.5
   floatSpin: 240
   fadeMaterialTemplate: {fileID: 2100000, guid: 7b80ed944561e45eaa852ca4f44cab0c, type: 2}
+--- !u!114 &8265461152241135291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743587818781043635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b6a74076c6524010af491de182a1708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoomerangGuardian.Interaction.IdleWander
+  visual: {fileID: 7443410279937410329}
+  driftRadius: 0.35
+  driftSpeed: 0.4
+  bobHeight: 0.12
+  spinSpeedRange: {x: 30, y: 120}
 --- !u!1 &1129093760882210350
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace BoomerangGuardian.Cameras
 {
@@ -6,6 +7,7 @@ namespace BoomerangGuardian.Cameras
     /// Top-down orthographic camera for the minimap (PB-15, ADR-0007).
     /// It follows the player and renders only the Minimap layer (flat icons) into a
     /// RenderTexture, which the HUD shows in the upper-right corner.
+    /// Scene fog is switched off just for this camera's render, so the map stays readable at night.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public class MinimapCamera : MonoBehaviour
@@ -20,11 +22,38 @@ namespace BoomerangGuardian.Cameras
         [SerializeField] private bool rotateWithTarget = false;
 
         private Camera minimapCamera;
+        private bool fogWasOn;
 
         private void Awake()
         {
             minimapCamera = GetComponent<Camera>();
             minimapCamera.orthographic = true;
+        }
+
+        private void OnEnable()
+        {
+            RenderPipelineManager.beginCameraRendering += OnBeginCamera;
+            RenderPipelineManager.endCameraRendering += OnEndCamera;
+        }
+
+        private void OnDisable()
+        {
+            RenderPipelineManager.beginCameraRendering -= OnBeginCamera;
+            RenderPipelineManager.endCameraRendering -= OnEndCamera;
+        }
+
+        // Fog is a global render setting; the map camera looks down from far away, so fog would grey it out.
+        private void OnBeginCamera(ScriptableRenderContext context, Camera cam)
+        {
+            if (cam != minimapCamera) return;
+            fogWasOn = RenderSettings.fog;
+            RenderSettings.fog = false;
+        }
+
+        private void OnEndCamera(ScriptableRenderContext context, Camera cam)
+        {
+            if (cam != minimapCamera) return;
+            RenderSettings.fog = fogWasOn;
         }
 
         private void LateUpdate()

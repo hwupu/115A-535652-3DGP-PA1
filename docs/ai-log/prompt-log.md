@@ -145,3 +145,7 @@ Template:
 - **AI (SM):** created #30, #31. Noted honestly that the rubric's ray-casting marks were already met by click picking; the preview makes it visible.
 - **AI (dev):** refactored rather than duplicated. One `Evaluate` for click and hover; the flight curve math made public so the preview equals the real path; the orbit kept separate from the gameplay yaw so movement and facing are unaffected. The ghost wander moves only the visual, so spawning and picking guarantees hold.
 - **Verification:** clone setup ×2 (idempotent), wiring ✓, macOS build + headless run without exceptions.
+
+## 2026-10-06 · #24 · Neutral preview color; midnight look guidance · Sprint 5 · PB-29, PB-30
+- **PO input:** preview just white, 0.25 opacity, "I don't want the user to know if it is valid"; "how to make the camera blur on distance? or I need to add fog? how can I make the scene look/feel midnight?"
+- **AI action:** replaced the two serialized colors with one field (otherwise the scene's saved green/red would silently win over new code defaults). Inspected the scene's real lighting state before advising (fog off, no Volume, post-processing off, white sun). Wrote a step-by-step art guide rather than applying art choices itself (the PO owns the look), and offered automation. **Anticipated a side effect** of the PO's next step: global fog would grey out the minimap, so the minimap camera now disables fog for its own render. Closed #31.
