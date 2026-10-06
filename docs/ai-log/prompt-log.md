@@ -130,3 +130,7 @@ Template:
 - **Scope change by the PO** mid-task: dropped the handoff's richer suggestions (animation events, upper-body mask, speed matching, split jump clips) for a minimal blend tree + triggers. Accepted glitches documented in ADR-0011.
 - **Verification:** clone setup ×2 (idempotent), wiring ✓, macOS build, headless run with no exceptions.
 - **Note for the report:** a multi-agent workflow. A Blender-side AI produced assets plus a handoff doc; this AI verified it against the real import before trusting it.
+
+## 2026-10-06 · #21 · PB-28 closed; audio folder · Sprint 5 · PB-28, PB-16
+- **PO input:** "it is working alright. we can close PB-28. which folder should I place audio files in for PB-16?"
+- **AI action:** committed the generated assets (AC_Player, M_Witch, FBX import settings, scene) and closed #29. Recommended `Assets/_Project/Audio/`, consistent with where the PO keeps models; Asset Store audio goes in a separate git-ignored folder.
