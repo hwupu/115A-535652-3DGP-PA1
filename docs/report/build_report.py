@@ -19,8 +19,8 @@ CHROME = os.path.expanduser("~/Applications/Google Chrome.app/Contents/MacOS/Goo
 
 # (insert after this heading, image file, caption)
 FIGURES = [
-    ("1. Use of AI Tools", "screenshot-gameplay.png", "Gameplay: Halloween arena, HUD, minimap and hover trajectory preview."),
-    ("2. Adoption of Scrum", "screenshot-of-pa1-sprint-board.png", "GitHub Project board mirroring the product backlog (issues per backlog item, one milestone per sprint)."),
+    ("1. Use of AI Tools", "game screenshot.png", "Gameplay with the Halloween arena, the HUD, the Hero's Journey banner, the minimap and the hover trajectory preview."),
+    ("2. Adoption of Scrum", "screenshot-of-pa1-sprint-board.png", "GitHub Project board mirroring the product backlog, with one issue per backlog item and one milestone per sprint."),
 ]
 
 CSS = """
@@ -32,10 +32,12 @@ h2 { font-size: 10.6pt; margin: 7pt 0 2pt 0; border-bottom: 1px solid #bbb; padd
 p { margin: 0 0 4pt 0; text-align: justify; }
 code { font-family: Menlo, monospace; font-size: 8.2pt; background: #f2f2f2; padding: 0 2px; }
 figure { margin: 3pt 0 5pt 0; text-align: center; }
-figure img { max-width: 78%; max-height: 54mm; border: 1px solid #ccc; }
+figure img { max-width: 80%; max-height: 52mm; border: 1px solid #ccc; }
 figcaption { font-size: 7.8pt; color: #555; margin-top: 1pt; }
 .credits { font-size: 7.6pt; line-height: 1.25; }
 .todo { background: #fff3c4; }
+.keep, figure { break-inside: avoid; page-break-inside: avoid; }
+h2 { break-after: avoid; }
 """
 
 
@@ -55,7 +57,7 @@ def figure_html(name: str, caption: str) -> str:
         print(f"  (figure skipped, not found: {name})")
         return ""
     FIGURE_COUNT[0] += 1   # number only the figures actually shown
-    return f'<figure><img src="{name}"><figcaption>Figure {FIGURE_COUNT[0]}. {html.escape(caption)}</figcaption></figure>'
+    return f'<figure><img src="{name.replace(' ', '%20')}"><figcaption>Figure {FIGURE_COUNT[0]}. {html.escape(caption)}</figcaption></figure>'
 
 
 def build_html() -> tuple[str, int]:
@@ -66,10 +68,9 @@ def build_html() -> tuple[str, int]:
             parts.append(f"<h1>{inline(b[2:])}</h1>")
         elif b.startswith("## "):
             title = b[3:]
-            parts.append(f"<h2>{inline(title)}</h2>")
-            for after, img, cap in FIGURES:
-                if title == after:
-                    parts.append(figure_html(img, cap))
+            figures = "".join(figure_html(img, cap) for after, img, cap in FIGURES if title == after)
+            # Keep a heading together with its figure, so neither is stranded at a page break.
+            parts.append(f'<div class="keep"><h2>{inline(title)}</h2>{figures}</div>')
         elif b.startswith("Pu-Hsuan Wu") or "NYCU 535652" in b.split("\n")[0][:80]:
             parts.append(f'<p class="meta">{inline(b)}</p>')
         else:

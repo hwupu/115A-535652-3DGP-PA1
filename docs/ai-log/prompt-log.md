@@ -153,3 +153,8 @@ Template:
 ## 2026-10-06 · #25 · Report draft · Sprint 5 · PB-22
 - **PO input:** close PB-20 and PB-29; "generate report".
 - **AI action:** wrote the AI-usage and Scrum sections from the project's own evidence (git log, issue counts, ADRs, prompt log, sprint retros) rather than from memory. Rendered locally with headless Chrome (checked for local tools first; no external upload service). Checked the requirements automatically (pages ≤ 2, words ≥ 500). **Did not write the PO's reflection**: it left highlighted placeholders with suggested points and asked the PO, since the spec asks for genuine reflection.
+
+## 2026-10-06 · #26 · Report rewrite (essay style) with the PO's reflection · Sprint 5 · PB-22
+- **PO input:** essay style; no "I" (use "the [subject]"); avoid ":" and "-" because they make it feel AI generated; four reflection points; skip the skybox publisher; screenshot added.
+- **AI action:** rewrote all sections as continuous prose in the third person, wove in the PO's reflection close to the original wording, and added a **mechanical style check** (regex for first-person pronouns, colons and dashes in the prose) instead of relying on proofreading. Credit titles were kept verbatim for accurate attribution. Fixed a page-break layout issue after inspecting the rendered PDF.
+- **Flagged to the PO:** the spec asks to acknowledge *any* third-party assets, so leaving out the skybox is the PO's informed choice.
