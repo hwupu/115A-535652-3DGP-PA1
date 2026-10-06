@@ -18,3 +18,6 @@ Deterministic and stable, which is graded under "overall stability". The impact 
 - **Obstacles:** on contact the boomerang applies a small impulse and returns early (PO decision). **Any un-hit target** touched on the way counts as a hit.
 - **Returning:** ignores all collisions (stability). Turns back if its target disappears (platform) or was hit by another boomerang.
 - The outbound path follows the target's live position, so a pushed target is still reached. Reaching the end of the path counts as a hit even without a trigger contact (guards against tunnelling).
+
+## Amendment (2026-10-06, PB-29)
+The outbound curve math is public and shared (`BoomerangProjectile.ControlPoint` / `Bezier`), so the hover trajectory preview draws exactly the path the boomerang will fly. Click and hover use the same `TargetSelector.Evaluate`, so the preview colour always matches what a click would do.

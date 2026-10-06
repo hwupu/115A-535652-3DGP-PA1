@@ -43,6 +43,8 @@ namespace BoomerangGuardian.Interaction
         /// <summary>Raised with the reason and a player-facing message for invalid selections.</summary>
         public event Action<SelectionResult, string> SelectionRejected;
 
+        /// <summary>Maximum ray length in meters.</summary>
+        public float MaxRayDistance => maxRayDistance;
         public float MaxThrowRange => ConfigLoader.Current?.maxThrowRange ?? maxThrowRange;
 
         private bool selectRequested;
@@ -72,32 +74,64 @@ namespace BoomerangGuardian.Interaction
 
         public SelectionResult Select(Vector2 screenPosition)
         {
+            SelectionResult result = Evaluate(screenPosition, out Target target, out _, out string message, out string clickedName, drawDebugRay: true);
+            switch (result)
+            {
+                case SelectionResult.AlreadyHit:
+                    return result;   // already flying away; ignore quietly
+                case SelectionResult.Thrown:
+                    thrower.Throw(target);
+                    Debug.Log($"Selected {target.name} → boomerang thrown.");
+                    TargetSelected?.Invoke(target);
+                    return result;
+                default:
+                    return Reject(result, message, clickedName);
+            }
+        }
+
+        /// <summary>
+        /// Ray casts from the cursor and decides what a click would do, without doing it.
+        /// Used by clicks (<see cref="Select"/>) and by the hover preview (PB-29).
+        /// <paramref name="aimPoint"/> is the target's aim point, or the hit point on an invalid object.
+        /// Returns <see cref="SelectionResult.Thrown"/> when a click would throw.
+        /// </summary>
+        public SelectionResult Evaluate(Vector2 screenPosition, out Target target, out Vector3 aimPoint,
+            out string message, out string clickedName, bool drawDebugRay = false)
+        {
             Ray ray = cameraRig.ViewCamera.ScreenPointToRay(screenPosition);
             bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, maxRayDistance, pickMask, QueryTriggerInteraction.Ignore);
-            Debug.DrawRay(ray.origin, ray.direction * (hitSomething ? hit.distance : maxRayDistance),
-                hitSomething ? Color.yellow : Color.gray, 1f);
+            if (drawDebugRay)
+                Debug.DrawRay(ray.origin, ray.direction * (hitSomething ? hit.distance : maxRayDistance),
+                    hitSomething ? Color.yellow : Color.gray, 1f);
 
-            Target target = hitSomething ? hit.collider.GetComponentInParent<Target>() : null;
+            target = hitSomething ? hit.collider.GetComponentInParent<Target>() : null;
+            aimPoint = hitSomething ? hit.point : ray.GetPoint(maxRayDistance);
+            clickedName = hitSomething ? hit.collider.name : "(nothing)";
+            message = null;
+
             if (target == null)
             {
-                string message = !hitSomething ? "Nothing there to throw at."
+                message = !hitSomething ? "Nothing there to throw at."
                     : hit.collider.GetComponentInParent<Obstacle>() != null ? "That's an obstacle, not a target!"
                     : "That's not a target!";
-                return Reject(SelectionResult.NotATarget, message, hitSomething ? hit.collider.name : "(nothing)");
+                return SelectionResult.NotATarget;
             }
 
-            if (target.IsHit) return SelectionResult.AlreadyHit;   // already flying away; ignore quietly
+            aimPoint = target.AimPoint;
+            if (target.IsHit) return SelectionResult.AlreadyHit;
 
-            float distance = Vector3.Distance(thrower.ThrowOrigin, target.AimPoint);
+            float distance = Vector3.Distance(thrower.ThrowOrigin, aimPoint);
             if (distance > MaxThrowRange)
-                return Reject(SelectionResult.TooFar, $"Too far! {distance:0} m (max {MaxThrowRange:0} m)", target.name);
+            {
+                message = $"Too far! {distance:0} m (max {MaxThrowRange:0} m)";
+                return SelectionResult.TooFar;
+            }
 
             if (!thrower.IsReady)
-                return Reject(SelectionResult.OnCooldown, $"Boomerang not ready ({thrower.CooldownRemaining:0.0} s)", target.name);
-
-            thrower.Throw(target);
-            Debug.Log($"Selected {target.name} at {distance:0.0} m → boomerang thrown.");
-            TargetSelected?.Invoke(target);
+            {
+                message = $"Boomerang not ready ({thrower.CooldownRemaining:0.0} s)";
+                return SelectionResult.OnCooldown;
+            }
             return SelectionResult.Thrown;
         }
 

@@ -26,6 +26,7 @@ namespace BoomerangGuardian.Boomerang
         public event Action<Obstacle> ObstacleHit;
         public event Action Caught;
 
+        public BoomerangProjectile Prefab => boomerangPrefab;
         public float Cooldown => ConfigLoader.Current?.boomerangCooldown ?? cooldown;
         public float Speed => ConfigLoader.Current?.boomerangSpeed ?? speed;
         public Vector3 ThrowOrigin => hand != null ? hand.position : transform.position + Vector3.up;

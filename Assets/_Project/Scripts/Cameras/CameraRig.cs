@@ -59,6 +59,10 @@ namespace BoomerangGuardian.Cameras
         [Tooltip("Smoothing time for distance changes (s).")]
         [SerializeField, Min(0f)] private float zoomSmoothTime = 0.1f;
 
+        [Header("Orbit preview (hold MMB, PB-30)")]
+        [Tooltip("Seconds the camera takes to return after the middle mouse button is released.")]
+        [SerializeField, Min(0.01f)] private float orbitReturnTime = 0.35f;
+
         [Header("Third-person collision")]
         [Tooltip("Layers that block the camera.")]
         [SerializeField] private LayerMask collisionMask = ~0;
@@ -69,7 +73,10 @@ namespace BoomerangGuardian.Cameras
         public event Action<CameraMode> ModeChanged;
 
         public CameraMode Mode { get; private set; }
+        /// <summary>Gameplay yaw: the player moves and faces by this. The orbit preview does not change it.</summary>
         public float Yaw => yaw;
+        /// <summary>True while the middle-mouse orbit preview is held.</summary>
+        public bool IsOrbiting { get; private set; }
         public Camera ViewCamera { get; private set; }
 
         private const float MinCollisionDistance = 0.3f;
@@ -82,6 +89,8 @@ namespace BoomerangGuardian.Cameras
         private float zoomVelocity;
         private bool cursorLocked;
         private bool skipNextLookDelta;
+        private float orbitYaw, orbitPitch;             // camera-only offsets while orbiting
+        private float orbitYawVelocity, orbitPitchVelocity;
 
         private void Awake()
         {
@@ -119,7 +128,7 @@ namespace BoomerangGuardian.Cameras
             UpdateLook();
             UpdateZoom();
 
-            Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
+            Quaternion rotation = Quaternion.Euler(pitch + orbitPitch, yaw + orbitYaw, 0f);
             if (Mode == CameraMode.FirstPerson)
             {
                 transform.SetPositionAndRotation(target.position + eyeOffset, rotation);
@@ -135,13 +144,22 @@ namespace BoomerangGuardian.Cameras
 
         private void UpdateLook()
         {
-            bool looking = input != null && input.IsLookHeld;
-            if (lockCursorWhileLooking && looking != cursorLocked)
+            bool looking = input != null && input.IsLookHeld;              // RMB: turns camera + player
+            IsOrbiting = !looking && input != null && input.IsOrbitHeld;   // MMB: camera only, returns on release
+            bool rotating = looking || IsOrbiting;
+            if (lockCursorWhileLooking && rotating != cursorLocked)
             {
-                SetCursorLocked(looking);
-                skipNextLookDelta = looking;   // locking the cursor can produce one large delta spike
+                SetCursorLocked(rotating);
+                skipNextLookDelta = rotating;   // locking the cursor can produce one large delta spike
             }
-            if (!looking) return;
+
+            if (!IsOrbiting)
+            {
+                // Ease the orbit offsets back to zero: the view returns to where it was.
+                orbitYaw = Mathf.SmoothDampAngle(orbitYaw, 0f, ref orbitYawVelocity, orbitReturnTime);
+                orbitPitch = Mathf.SmoothDamp(orbitPitch, 0f, ref orbitPitchVelocity, orbitReturnTime);
+            }
+            if (!rotating) return;
 
             Vector2 delta = input.LookDelta;
             if (skipNextLookDelta)
@@ -151,9 +169,17 @@ namespace BoomerangGuardian.Cameras
             }
 
             // Mouse delta is already per-frame (pixels), so no Time.deltaTime here.
-            yaw += delta.x * lookSensitivity;
-            pitch -= delta.y * lookSensitivity;
-            pitch = ClampPitch(pitch);
+            if (looking)
+            {
+                yaw += delta.x * lookSensitivity;
+                pitch -= delta.y * lookSensitivity;
+                pitch = ClampPitch(pitch);
+            }
+            else
+            {
+                orbitYaw += delta.x * lookSensitivity;
+                orbitPitch = ClampPitch(pitch + orbitPitch - delta.y * lookSensitivity) - pitch;
+            }
         }
 
         private void UpdateZoom()

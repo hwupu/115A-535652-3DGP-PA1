@@ -97,11 +97,7 @@ namespace BoomerangGuardian.Boomerang
             pathT = 0f;
             start = previousPosition = transform.position;
 
-            // Control point: halfway, pushed to the right and up, which gives the classic curved throw.
-            Vector3 end = target.AimPoint;
-            Vector3 toTarget = end - start;
-            Vector3 right = Vector3.Cross(Vector3.up, toTarget.normalized);
-            control = (start + end) * 0.5f + right * (toTarget.magnitude * curve) + Vector3.up * arcHeight;
+            control = ControlPoint(start, target.AimPoint, curve, arcHeight);
 
             state = State.Outbound;
         }
@@ -194,7 +190,21 @@ namespace BoomerangGuardian.Boomerang
             Destroy(gameObject);
         }
 
-        private static Vector3 Bezier(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+        /// <summary>
+        /// Control point of the outbound curve: halfway, pushed to the right and up, which gives the
+        /// classic curved throw. Shared with the hover preview (PB-29), so the preview matches the flight.
+        /// </summary>
+        public static Vector3 ControlPoint(Vector3 start, Vector3 end, float curve, float arcHeight)
+        {
+            Vector3 toTarget = end - start;
+            Vector3 right = Vector3.Cross(Vector3.up, toTarget.normalized);
+            return (start + end) * 0.5f + right * (toTarget.magnitude * curve) + Vector3.up * arcHeight;
+        }
+
+        public float Curve => curve;
+        public float ArcHeight => arcHeight;
+
+        public static Vector3 Bezier(Vector3 p0, Vector3 p1, Vector3 p2, float t)
         {
             float u = 1f - t;
             return u * u * p0 + 2f * u * t * p1 + t * t * p2;

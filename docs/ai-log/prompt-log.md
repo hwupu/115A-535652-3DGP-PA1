@@ -139,3 +139,9 @@ Template:
 - **PO input:** "please use ffmpeg to compress it. I think ogg will work well for Unity and smaller file size?" plus a clip → event mapping.
 - **AI action:** probed every file first (192 kHz float AIFF, 13-min BGM, …). Found this Homebrew ffmpeg lacks `libvorbis`. Rather than silently using the experimental encoder or installing software, it explained the options, including that Unity re-encodes audio at import, and **asked**. The PO chose MP3. Encoded and verified with ffprobe (durations identical). Automated the wiring with `AudioSetup` instead of manual drag-and-drop; clone-verified (idempotent).
 - **Small AI slip:** the first ffmpeg loop failed because zsh does not word-split `$var` (fixed with `${=var}`). Caught immediately from the error output; nothing was written.
+
+## 2026-10-06 · #23 · Ghost wander, hover trajectory preview, MMB orbit · Sprint 5 · PB-20, 29, 30
+- **PO input:** close PB-16; "ghost randomly swift around and rotate"; new ticket for ray casting: trajectory preview (50 % opacity curve) when hovering targets **and** invalid objects; new ticket: hold middle click to orbit the camera without changing the character's direction, release returns (TA demo).
+- **AI (SM):** created #30, #31. Noted honestly that the rubric's ray-casting marks were already met by click picking; the preview makes it visible.
+- **AI (dev):** refactored rather than duplicated. One `Evaluate` for click and hover; the flight curve math made public so the preview equals the real path; the orbit kept separate from the gameplay yaw so movement and facing are unaffected. The ghost wander moves only the visual, so spawning and picking guarantees hold.
+- **Verification:** clone setup ×2 (idempotent), wiring ✓, macOS build + headless run without exceptions.

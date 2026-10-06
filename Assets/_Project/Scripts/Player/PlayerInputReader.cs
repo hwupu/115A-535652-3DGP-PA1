@@ -39,6 +39,9 @@ namespace BoomerangGuardian.Player
         /// <summary>True while the right mouse button is held.</summary>
         public bool IsLookHeld => GameplayEnabled && lookHold != null && lookHold.IsPressed();
 
+        /// <summary>True while the middle mouse button is held (orbit preview, PB-30).</summary>
+        public bool IsOrbitHeld => GameplayEnabled && orbitHold != null && orbitHold.IsPressed();
+
         /// <summary>Scroll wheel delta this frame (positive = away from the user).</summary>
         public float Zoom => GameplayEnabled && zoom != null ? zoom.ReadValue<float>() : 0f;
 
@@ -46,7 +49,7 @@ namespace BoomerangGuardian.Player
         public Vector2 PointerPosition => point != null ? point.ReadValue<Vector2>() : Vector2.zero;
 
         private InputActionMap map;
-        private InputAction move, look, lookHold, zoom, point;
+        private InputAction move, look, lookHold, orbitHold, zoom, point;
         private InputAction toggleSpeed, jump, switchView, select, quit, reloadConfig;
 
         private void Awake()
@@ -62,6 +65,7 @@ namespace BoomerangGuardian.Player
             move = map.FindAction("Move", true);
             look = map.FindAction("Look", true);
             lookHold = map.FindAction("LookHold", true);
+            orbitHold = map.FindAction("OrbitHold", true);
             zoom = map.FindAction("Zoom", true);
             point = map.FindAction("Point", true);
             toggleSpeed = map.FindAction("ToggleSpeed", true);

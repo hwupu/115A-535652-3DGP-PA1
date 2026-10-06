@@ -34,6 +34,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "OrbitHold",
+                    "type": "Button",
+                    "id": "e16f32a1-40fb-4940-a1b8-199345e60e91",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Zoom",
                     "type": "Value",
                     "id": "71adbe01-8ade-4c16-b325-ee7ed979b5cc",
@@ -269,6 +278,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "ReloadConfig",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67618d0d-f860-42a4-b5c9-2c6cb1d5f78e",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "OrbitHold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

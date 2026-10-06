@@ -9,8 +9,10 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 |---|---|---|---|---|
 | PB-18 | #19 | Theme + asset integration (follow `docs/guides/asset-swap.md`) | User | ✅ |
 | PB-16 | #17 | Real SFX for the 5 required events (+ collect / catch optional) | User finds, Claude wires if needed | ✅ |
-| PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); more as the PO asks | Claude | 🟨 |
+| PB-20 | #21 | Polish on request: ✅ ghost float-and-fade (ADR-0010); ghosts drift + spin (IdleWander) | Claude | 🟨 |
 | PB-28 | #29 | Animated player character (Little Witch), simple (ADR-0011) | Claude setup, User checks | ✅ |
+| PB-29 | #30 | Hover trajectory preview (ray casting) | Claude | 🟨 |
+| PB-30 | #31 | MMB orbit camera preview (demo mode) | Claude | 🟨 |
 | PB-21 | (#22 reopened if needed) | Final build + full rubric pass with final art | Both | ⬜ |
 | PB-22 | #23 | Report PDF: **on hold until the PO asks** | Claude drafts, User reflects | ⬜ |
 
@@ -43,6 +45,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 - **2026-10-06**: The PO ran the player setup and accepted PB-28 ("working alright"); committed the generated controller, material and import settings. PB-16 started; audio folder agreed: `Assets/_Project/Audio/`.
 
 - **2026-10-06 (later)**: The PO placed 6 freesound CC0 clips and the mapping. This ffmpeg has no libvorbis, so PO choice was **MP3 (LAME)**: SFX mono 44.1 kHz VBR q4, BGM stereo 24 kHz VBR q6. 16.3 MB → 6.1 MB, durations unchanged. Unity re-encodes to Vorbis at import anyway; the source format mainly affects repo/zip size. New `Editor/AudioSetup` (menu **Setup → Audio**): fills AudioManager slots by file prefix (`sfx_hit_` → both hit slots), import options (SFX DecompressOnLoad, BGM Streaming), `Systems/Music` looping at 0.3. Clone: run 1 set 6 importers + 6 slots + Music; run 2 = 0 changes; wiring ✓. Known: an MP3 adds a few ms of silence, so the BGM loop has a tiny gap (accepted).
+
+- **2026-10-06 (later)**: PB-16 closed (PO). New: PB-20 ghost wander; tickets PB-29 (#30) hover trajectory preview and PB-30 (#31) MMB orbit. Implementation: `TargetSelector.Evaluate` (shared by click and hover), `BoomerangProjectile.ControlPoint/Bezier` public (the preview draws the exact flight curve), `TrajectoryPreview` (LineRenderer, Sprites/Default, 50 % green/red), `IdleWander` (Perlin drift + bob + random spin, visual only), CameraRig orbit offsets (gameplay yaw untouched, SmoothDamp return), `OrbitHold` input on MMB. `Sprint5Setup` extended (now opens the scene first). Clone: setup run 1 OK, run 2 = 0 changes, wiring ✓, build + headless run without exceptions, spawn 330 / 0 failed / 0 overlaps.
 
 ## Review
 
