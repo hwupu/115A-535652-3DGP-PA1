@@ -149,3 +149,7 @@ Template:
 ## 2026-10-06 · #24 · Neutral preview color; midnight look guidance · Sprint 5 · PB-29, PB-30
 - **PO input:** preview just white, 0.25 opacity, "I don't want the user to know if it is valid"; "how to make the camera blur on distance? or I need to add fog? how can I make the scene look/feel midnight?"
 - **AI action:** replaced the two serialized colors with one field (otherwise the scene's saved green/red would silently win over new code defaults). Inspected the scene's real lighting state before advising (fog off, no Volume, post-processing off, white sun). Wrote a step-by-step art guide rather than applying art choices itself (the PO owns the look), and offered automation. **Anticipated a side effect** of the PO's next step: global fog would grey out the minimap, so the minimap camera now disables fog for its own render. Closed #31.
+
+## 2026-10-06 · #25 · Report draft · Sprint 5 · PB-22
+- **PO input:** close PB-20 and PB-29; "generate report".
+- **AI action:** wrote the AI-usage and Scrum sections from the project's own evidence (git log, issue counts, ADRs, prompt log, sprint retros) rather than from memory. Rendered locally with headless Chrome (checked for local tools first; no external upload service). Checked the requirements automatically (pages ≤ 2, words ≥ 500). **Did not write the PO's reflection**: it left highlighted placeholders with suggested points and asked the PO, since the spec asks for genuine reflection.

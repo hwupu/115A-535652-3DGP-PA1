@@ -52,6 +52,8 @@ Milestone: [Sprint 5 — Art, Audio & Ship](https://github.com/hwupu/115A-535652
 
 - **2026-10-06 (later)**: The PO closed PB-20 and PB-29 and asked for the report (PB-22).
 
+- **2026-10-06 (later)**: Report draft (PB-22): `docs/report/report.md` → `build_report.py` (A4 HTML → headless Chrome, local, no upload) → `Report_PA1_BoomerangGuardian.pdf`. 2 pages, ~940 words, sprint-board figure. AI and Scrum sections are drafted from the repo's own records (backlog, ADRs, sprint files, prompt log, git stats). **The reflection is left as marked placeholders for the PO's own words**, plus the skybox publisher and a gameplay screenshot.
+
 ## Review
 
 ## Retro

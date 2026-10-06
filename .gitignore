@@ -103,3 +103,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Report build intermediate (source: docs/report/report.md)
+docs/report/report.html
