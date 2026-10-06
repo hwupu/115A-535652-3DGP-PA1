@@ -134,3 +134,8 @@ Template:
 ## 2026-10-06 · #21 · PB-28 closed; audio folder · Sprint 5 · PB-28, PB-16
 - **PO input:** "it is working alright. we can close PB-28. which folder should I place audio files in for PB-16?"
 - **AI action:** committed the generated assets (AC_Player, M_Witch, FBX import settings, scene) and closed #29. Recommended `Assets/_Project/Audio/`, consistent with where the PO keeps models; Asset Store audio goes in a separate git-ignored folder.
+
+## 2026-10-06 · #22 · Audio compression and wiring · Sprint 5 · PB-16
+- **PO input:** "please use ffmpeg to compress it. I think ogg will work well for Unity and smaller file size?" plus a clip → event mapping.
+- **AI action:** probed every file first (192 kHz float AIFF, 13-min BGM, …). Found this Homebrew ffmpeg lacks `libvorbis`. Rather than silently using the experimental encoder or installing software, it explained the options, including that Unity re-encodes audio at import, and **asked**. The PO chose MP3. Encoded and verified with ffprobe (durations identical). Automated the wiring with `AudioSetup` instead of manual drag-and-drop; clone-verified (idempotent).
+- **Small AI slip:** the first ffmpeg loop failed because zsh does not word-split `$var` (fixed with `${=var}`). Caught immediately from the error output; nothing was written.
