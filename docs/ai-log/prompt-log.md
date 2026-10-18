@@ -158,3 +158,14 @@ Template:
 - **PO input:** essay style; no "I" (use "the [subject]"); avoid ":" and "-" because they make it feel AI generated; four reflection points; skip the skybox publisher; screenshot added.
 - **AI action:** rewrote all sections as continuous prose in the third person, wove in the PO's reflection close to the original wording, and added a **mechanical style check** (regex for first-person pronouns, colons and dashes in the prose) instead of relying on proofreading. Credit titles were kept verbatim for accurate attribution. Fixed a page-break layout issue after inspecting the rendered PDF.
 - **Flagged to the PO:** the spec asks to acknowledge *any* third-party assets, so leaving out the skybox is the PO's informed choice.
+
+## 2026-10-15 · #27 · Demo cheat sheets (C# and Unity lifecycle) · Sprint 5 · docs
+- **PO input:** "I have to demo and explain the code to the TA", so create cheat sheets: first common C# for a Python 3 / TypeScript / minor C++ background (explain coroutines and lambdas, with examples from this project), then the extended event-function lifecycle with project code.
+- **AI action:** wrote `docs/cheatsheets/01-csharp-cheatsheet.md` and `02-unity-lifecycle-cheatsheet.md` from the actual source, no code changed. Searched the repo before writing the coroutine and lambda sections and found **no `StartCoroutine` anywhere** and **no runtime lambdas** (only Editor setup scripts use them; `=>` elsewhere is expression-bodied members, and `yield return` is only in iterator methods). Said so in the sheets instead of inventing examples, explained what the project does instead (`Time.time` stamps, `Destroy(obj, delay)`), and marked the coroutine/closure snippets as illustrative.
+- **Verification:** spot-checked the cited line numbers with grep and corrected five that were off by one or two. The sheets were not run or compiled; they only quote existing code.
+
+## 2026-10-15 · #28 · Demo cheat sheets for walkthrough parts 2-4 · Sprint 5 · docs
+- **PO input:** "finished reading part 1; do the same for part 2, 3 and 4" (architecture, rubric, demo preparation), to be read the next day.
+- **AI action:** wrote `docs/cheatsheets/03-architecture-cheatsheet.md`, `04-rubric-cheatsheet.md` and `05-demo-prep-cheatsheet.md`; no code changed. Re-read the files only skimmed before (SpawnManager, GameConfig, HUD, Journey, minimap, audio, ADR-0003…0011), parsed the real input bindings from `PlayerControls.inputactions` and the real scene hierarchy from `Main.unity` instead of describing them from memory, and cited current line numbers.
+- **Flagged as unverified in the sheets:** which components sit on `Player` vs `GameManager`, and the actual `pickMask` value; both need a quick look in the Inspector. The traceability table still shows the report row as todo although the report was drafted.
+- **Verification:** line numbers spot-checked with grep; nothing was run or compiled.
