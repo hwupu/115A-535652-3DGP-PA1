@@ -9,7 +9,7 @@ Script paths relative to `Assets/_Project/Scripts/`.
 
 | ✔ | Check | How |
 |---|---|---|
-| ☐ | Project opens, **no red errors** in the Console | Unity Hub → open the project folder (Unity **6000.3.25f1**). Console → clear → look for `error CS` |
+| ☐ | Project opens, **no red errors** in the Console | Unity Hub → open the project folder (Unity **6000.3.26f1**). Console → clear → look for `error CS` |
 | ☐ | Scene is `Assets/_Project/Scenes/Main.unity` | double-click it |
 | ☐ | Press Play: spawn line shows **330 objects, 0 overlapping pairs** | Console |
 | ☐ | **Validate Wiring** is clean | menu *Boomerang Guardian → Validate Wiring* |
@@ -23,7 +23,7 @@ Script paths relative to `Assets/_Project/Scripts/`.
 
 **Headless smoke test of a build** (no window; checks it launches without exceptions):
 `"<app>/Contents/MacOS/Boomerang Guardian" -batchmode -nographics -logFile /tmp/run.log`, then `grep -i exception /tmp/run.log`.
-**Compile check without the Editor** (only when the Editor is *closed*): `/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then `grep "error CS" /tmp/unity-compile.log`. Never batch-run on the live project while the Editor is open (use an APFS clone, see `CLAUDE.md`).
+**Compile check without the Editor** (only when the Editor is *closed*): `/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then `grep "error CS" /tmp/unity-compile.log`. Never batch-run on the live project while the Editor is open (use an APFS clone, see `CLAUDE.md`).
 
 ---
 

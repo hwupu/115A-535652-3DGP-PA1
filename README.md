@@ -1,7 +1,7 @@
 # The Boomerang Guardian: A Hero's Journey
 
 NYCU 535652 3D Game Programming — Programming Assignment 1.
-Unity **6000.3.25f1 LTS** (URP).
+Unity **6000.3.26f1 LTS** (URP).
 
 ## Open & play
 1. Unity Hub → **Add → Add project from disk** → select this folder.

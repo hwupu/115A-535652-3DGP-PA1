@@ -1,10 +1,10 @@
 # The Boomerang Guardian, a Report on AI Tools and Scrum
 
-Pu-Hsuan Wu · NYCU 535652 3D Game Programming · Programming Assignment 1 · Unity 6000.3.25f1 LTS with URP · github.com/hwupu/115A-535652-3DGP-PA1
+Pu-Hsuan Wu · NYCU 535652 3D Game Programming · Programming Assignment 1 · Unity 6000.3.26f1 LTS with URP · github.com/hwupu/115A-535652-3DGP-PA1
 
 ## 1. Use of AI Tools
 
-The project was developed in Unity 6000.3.25f1 LTS with the Universal Render Pipeline over six days in October 2026. The main AI tool was Claude Code running Claude Opus 5.5, an AI agent that works in the terminal with direct access to the project folder, git, the GitHub command line tool and the batch mode of Unity. A second AI agent assisted the developer in rigging and animating the witch character in Blender and handed over a written document that described every animation clip. The role of the AI agent was split in two. It first acted as Scrum Master and turned the 100 mark rubric into a traceable product backlog, and it then acted as programming assistant, while the developer acted as Product Owner as well as asset, scene and sound designer.
+The project was developed in Unity 6000.3.26f1 LTS with the Universal Render Pipeline over six days in October 2026. The main AI tool was Claude Code running Claude Opus 5.5, an AI agent that works in the terminal with direct access to the project folder, git, the GitHub command line tool and the batch mode of Unity. A second AI agent assisted the developer in rigging and animating the witch character in Blender and handed over a written document that described every animation clip. The role of the AI agent was split in two. It first acted as Scrum Master and turned the 100 mark rubric into a traceable product backlog, and it then acted as programming assistant, while the developer acted as Product Owner as well as asset, scene and sound designer.
 
 The AI agent wrote all C# code of the game, 35 files with roughly 3,000 lines of gameplay logic and 2,000 lines of Editor tooling, together with step by step guides for the work inside the Unity Editor. Every major design decision was recorded as an Architecture Decision Record, eleven in total, and every significant interaction was summarised in a prompt log of 24 entries. From the second sprint on, the AI agent also wrote Editor setup scripts that create prefabs, link components and build the HUD and the minimap automatically. Scene integration that took the developer 45 to 60 minutes by hand in the first sprint took about ten minutes in the second.
 

@@ -3,7 +3,7 @@
 ## Project
 - NYCU 535652 3D Game Programming, Programming Assignment 1 (single-person).
 - Spec: `docs/reference/3DGP_PA_01_Instruction.pdf`. Rubric → backlog mapping: `docs/00-requirements-traceability.md`.
-- Engine: **Unity 6000.3.25f1 LTS**, URP (Universal 3D template). This folder **is** the Unity project root.
+- Engine: **Unity 6000.3.26f1 LTS**, URP (Universal 3D template). This folder **is** the Unity project root.
 - Target finish ≈ 2026-10-14 (2 weeks starting 2026-10-01).
 
 ## Roles
@@ -13,7 +13,7 @@
 ## Code conventions
 - All our own content lives in `Assets/_Project/`; third-party packs stay in their own folders.
 - Scripts: `Assets/_Project/Scripts/{Core,Player,Cameras,Boomerang,Spawning,Interaction,UI,Audio,Editor}`; namespace `BoomerangGuardian.<Folder>`. The folder is `Cameras` (plural) because a `BoomerangGuardian.Camera` namespace would shadow `UnityEngine.Camera`.
-- Compile check without opening the Editor (only when the Editor is closed): `/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then grep for `error CS`.
+- Compile check without opening the Editor (only when the Editor is closed): `/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/MacOS/Unity -batchmode -quit -nographics -projectPath "$PWD" -logFile /tmp/unity-compile.log`, then grep for `error CS`.
 - Step-by-step Editor guides for the User live in `docs/guides/`.
 - Scene wiring is automated with idempotent Editor setup scripts in `Scripts/Editor/` (namespace `BoomerangGuardian.EditorTools`, menu **Boomerang Guardian → Setup**), per ADR-0009. Open the scene before creating assets in a setup run (`OpenScene` unloads in-memory assets).
 - If the Editor is open, verify in an APFS clone: `cp -cR Assets Packages ProjectSettings Library /tmp/bg-verify/`, then batch-run there (`-executeMethod …`). Never batch-run on the real project while the Editor is open.
