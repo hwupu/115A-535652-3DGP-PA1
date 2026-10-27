@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace BoomerangGuardian.Interaction
 {
+    /// <summary>What a click at the cursor would do; shared by clicks and the hover preview.</summary>
     public enum SelectionResult
     {
         Thrown,
@@ -22,6 +23,10 @@ namespace BoomerangGuardian.Interaction
     /// Left click → ray from the camera through the cursor → the first non-trigger collider.
     /// A valid target in range with the boomerang ready → throw. Otherwise the selection is
     /// rejected (error sound + HUD message). Clicking an already-hit target is silently ignored.
+    /// Talks to: <see cref="PlayerInputReader"/> (SelectPressed event, pointer position),
+    /// <see cref="CameraRig"/> (the camera to cast from), <see cref="BoomerangThrower"/> (range origin,
+    /// cooldown, Throw). Raises SelectionRejected, which HudController (message) and AudioManager
+    /// (error sound) listen to. <see cref="TrajectoryPreview"/> reuses <see cref="Evaluate"/>.
     /// </summary>
     public class TargetSelector : MonoBehaviour
     {
@@ -45,10 +50,13 @@ namespace BoomerangGuardian.Interaction
 
         /// <summary>Maximum ray length in meters.</summary>
         public float MaxRayDistance => maxRayDistance;
+        /// <summary>Maximum throw distance: config.json value if loaded (ADR-0008), else the Inspector value.</summary>
         public float MaxThrowRange => ConfigLoader.Current?.maxThrowRange ?? maxThrowRange;
 
         private bool selectRequested;
 
+        // Subscribe in OnEnable and unsubscribe in OnDisable (always paired), so a disabled or
+        // destroyed selector never receives clicks and the event holds no dangling reference.
         private void OnEnable()
         {
             if (input != null) input.SelectPressed += RequestSelect;
@@ -72,6 +80,9 @@ namespace BoomerangGuardian.Interaction
             Select(input.PointerPosition);
         }
 
+        /// <summary>
+        /// Handles a click at a screen position: evaluates it, then throws, ignores, or rejects.
+        /// </summary>
         public SelectionResult Select(Vector2 screenPosition)
         {
             SelectionResult result = Evaluate(screenPosition, out Target target, out _, out string message, out string clickedName, drawDebugRay: true);
@@ -98,12 +109,16 @@ namespace BoomerangGuardian.Interaction
         public SelectionResult Evaluate(Vector2 screenPosition, out Target target, out Vector3 aimPoint,
             out string message, out string clickedName, bool drawDebugRay = false)
         {
+            // ScreenPointToRay: a ray from the camera through the cursor pixel into the 3D world.
+            // Raycast returns the first collider along it; pickMask excludes layers (e.g. Player), and
+            // QueryTriggerInteraction.Ignore skips trigger volumes so they don't block the pick.
             Ray ray = cameraRig.ViewCamera.ScreenPointToRay(screenPosition);
             bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, maxRayDistance, pickMask, QueryTriggerInteraction.Ignore);
-            if (drawDebugRay)
+            if (drawDebugRay)   // visible in the Scene view for 1 s (yellow = hit, grey = miss)
                 Debug.DrawRay(ray.origin, ray.direction * (hitSomething ? hit.distance : maxRayDistance),
                     hitSomething ? Color.yellow : Color.gray, 1f);
 
+            // Identify by component, not tag: the collider may be on a child of the Target prefab root.
             target = hitSomething ? hit.collider.GetComponentInParent<Target>() : null;
             aimPoint = hitSomething ? hit.point : ray.GetPoint(maxRayDistance);
             clickedName = hitSomething ? hit.collider.name : "(nothing)";
@@ -118,8 +133,10 @@ namespace BoomerangGuardian.Interaction
             }
 
             aimPoint = target.AimPoint;
+            // Checks in priority order: already hit → too far → cooldown → OK.
             if (target.IsHit) return SelectionResult.AlreadyHit;
 
+            // Range is measured from the hand to the target's center, the same points the boomerang flies between.
             float distance = Vector3.Distance(thrower.ThrowOrigin, aimPoint);
             if (distance > MaxThrowRange)
             {
@@ -135,6 +152,7 @@ namespace BoomerangGuardian.Interaction
             return SelectionResult.Thrown;
         }
 
+        /// <summary>Logs the invalid pick and raises SelectionRejected (HUD message + error sound).</summary>
         private SelectionResult Reject(SelectionResult reason, string message, string clickedName)
         {
             Debug.Log($"Invalid selection ({reason}): clicked {clickedName}.");

@@ -20,6 +20,10 @@ namespace BoomerangGuardian.EditorTools
     /// <summary>
     /// Sprint 3 setup (ADR-0009): minimap (PB-15), Hero's Journey intro / stages / ending (PB-19),
     /// product name, and template clean-up. Idempotent, like Sprint2Setup.
+    /// Minimap design (ADR-0007): a "Minimap" layer holds flat colored icons (MinimapIcon) that only an
+    /// orthographic top-down MinimapCamera renders into a RenderTexture; the main camera excludes that
+    /// layer, and a RawImage in the HUD shows the texture. Story UI: intro / stage / end panels wired to
+    /// the JourneyController, which drives the Hero's Journey stages.
     /// Menu: Boomerang Guardian → Setup → Sprint 3 (Feature Complete)
     /// Batch: -executeMethod BoomerangGuardian.EditorTools.Sprint3Setup.RunBatch
     /// </summary>
@@ -32,9 +36,11 @@ namespace BoomerangGuardian.EditorTools
         private const string ArrowMeshPath = SetupUtils.ProjectRoot + "/Settings/MinimapArrow.asset";
         private const string MinimapLayer = "Minimap";
 
-        // Icon heights: higher draws on top in the top-down view.
+        // Icon heights: higher draws on top in the top-down view (closer to the camera wins the depth test),
+        // so the player arrow is never hidden under a target or the ground.
         private const float GroundIconY = 10f, StaticIconY = 11f, ObstacleIconY = 19f, TargetIconY = 20f, CollectibleIconY = 21f, PlayerIconY = 25f;
 
+        /// <summary>Menu entry: refuses to run in Play Mode and lets the user save open scene changes first.</summary>
         [MenuItem("Boomerang Guardian/Setup/Sprint 3 (Feature Complete)")]
         public static void RunFromMenu()
         {
@@ -51,12 +57,15 @@ namespace BoomerangGuardian.EditorTools
                 "Done. See the Console for the full report.\n\nNext: press Play and follow docs/guides/sprint-03-setup.md.", "OK");
         }
 
+        /// <summary>Entry point for -executeMethod (no dialogs, so it works in -batchmode).</summary>
         public static void RunBatch() => Debug.Log(Run());
 
+        /// <summary>Runs all steps and returns the text report.</summary>
         private static string Run()
         {
             var u = new SetupUtils();
 
+            // Open the scene first: OpenScene unloads in-memory assets created earlier in a run.
             Scene scene = SceneManager.GetActiveScene();
             if (scene.path != MainScenePath) scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
 
@@ -64,9 +73,11 @@ namespace BoomerangGuardian.EditorTools
             CleanUpTemplate(u);
 
             // ---------- Minimap assets ----------
+            // Creates the user layer in the first free slot if needed; -1 means all slots are taken.
             int layer = u.EnsureLayer(MinimapLayer);
             if (layer < 0) return Finish(u, scene);
 
+            // Unlit materials: icon colors stay flat and readable regardless of scene lighting.
             Material iconTarget = u.GetOrCreateUnlitMaterial("MI_Target", new Color(1f, 0.3f, 0.3f));
             Material iconObstacle = u.GetOrCreateUnlitMaterial("MI_Obstacle", new Color(0.75f, 0.75f, 0.75f));
             Material iconCollectible = u.GetOrCreateUnlitMaterial("MI_Collectible", new Color(1f, 0.85f, 0.3f));
@@ -78,6 +89,8 @@ namespace BoomerangGuardian.EditorTools
             RenderTexture minimapTexture = GetOrCreateRenderTexture(u);
 
             // Icons on every prefab listed in SpawnConfig (rerun after adding variants).
+            // Because the icon is inside the prefab, every spawned instance shows up on the minimap
+            // automatically; no runtime registration is needed.
             var spawnConfig = AssetDatabase.LoadAssetAtPath<SpawnConfig>(SpawnConfigPath);
             if (spawnConfig == null)
             {
@@ -105,6 +118,8 @@ namespace BoomerangGuardian.EditorTools
             AddPlayerIcon(u, motor.transform, layer, arrow, iconPlayer);
             AddStaticIcons(u, scene, layer, iconGround, iconWall, iconPlatform);
 
+            // Bit math on the culling mask: test the Minimap bit with &, clear it with &= ~bit,
+            // so the main camera never draws the icons floating above the world.
             Camera mainCamera = rig.GetComponent<Camera>();
             if ((mainCamera.cullingMask & (1 << layer)) != 0)
             {
@@ -126,6 +141,8 @@ namespace BoomerangGuardian.EditorTools
             (GameObject intro, Button begin) = BuildIntroPanel(u, canvas);
             (GameObject end, TMP_Text summary, Button cont, Button quit) = BuildEndPanel(u, canvas);
 
+            // JourneyController (PB-19) needs references to every system it pauses, resets or reads
+            // (input, movement, camera, thrower, score, spawner, platform, app) plus its UI panels.
             var journey = u.GetOrAdd<JourneyController>(hud.gameObject);
             GameObject player = motor.gameObject;
             u.LinkIfEmpty(journey, "input", player.GetComponent<PlayerInputReader>());
@@ -150,6 +167,7 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- Project ----------
 
+        /// <summary>Replaces the template's default product name (used for the build's app name), unless already customized.</summary>
         private static void SetProductInfo(SetupUtils u)
         {
             if (PlayerSettings.productName == "My project" || string.IsNullOrEmpty(PlayerSettings.productName))
@@ -164,6 +182,10 @@ namespace BoomerangGuardian.EditorTools
             }
         }
 
+        /// <summary>
+        /// Deletes the URP template's SampleScene (and its folder if now empty) and makes Main.unity
+        /// the only, enabled scene in the build list.
+        /// </summary>
         private static void CleanUpTemplate(SetupUtils u)
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SampleScenePath) != null)
@@ -177,6 +199,7 @@ namespace BoomerangGuardian.EditorTools
                 }
             }
 
+            // Keep only the Main entry; only write the list back if it actually changed.
             var scenes = new List<EditorBuildSettingsScene>();
             foreach (EditorBuildSettingsScene s in EditorBuildSettings.scenes)
                 if (s.path == MainScenePath) scenes.Add(s);
@@ -191,6 +214,7 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- Minimap ----------
 
+        /// <summary>Builds (once) the player's arrow icon mesh and saves it as an asset.</summary>
         private static Mesh GetOrCreateArrowMesh(SetupUtils u)
         {
             var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(ArrowMeshPath);
@@ -201,6 +225,9 @@ namespace BoomerangGuardian.EditorTools
             }
 
             // Flat arrowhead in the XZ plane pointing +Z, facing up (clockwise seen from above).
+            // 4 vertices: tip (0,0,1), right wing, inner notch (0,0,-0.35), left wing.
+            // Two triangles (tip-right-notch, tip-notch-left) form the chevron. Unity treats clockwise
+            // winding as the front face, so the arrow is visible to the camera looking down.
             mesh = new Mesh { name = "MinimapArrow" };
             mesh.vertices = new[] { new Vector3(0f, 0f, 1f), new Vector3(0.7f, 0f, -0.7f), new Vector3(0f, 0f, -0.35f), new Vector3(-0.7f, 0f, -0.7f) };
             mesh.triangles = new[] { 0, 1, 2, 0, 2, 3 };
@@ -219,17 +246,21 @@ namespace BoomerangGuardian.EditorTools
                 u.Skipped(RenderTexturePath);
                 return texture;
             }
+            // 512x512 color target with a 16-bit depth buffer (needed so higher icons occlude lower ones).
             texture = new RenderTexture(512, 512, 16) { name = "RT_Minimap", antiAliasing = 2 };
             AssetDatabase.CreateAsset(texture, RenderTexturePath);
             u.Created(RenderTexturePath);
             return texture;
         }
 
+        /// <summary>Adds a minimap icon inside a prefab asset, skipping prefabs that already have one.</summary>
         private static void AddIconToPrefab(SetupUtils u, Component prefabComponent, int layer, PrimitiveType shape,
             Material material, Vector3 scale, float yaw, float height)
         {
             if (prefabComponent == null) return;
             string path = AssetDatabase.GetAssetPath(prefabComponent);
+            // LoadPrefabContents opens the prefab in an isolated preview scene for editing; the finally
+            // block always unloads it, even after an early return or an exception.
             GameObject root = PrefabUtility.LoadPrefabContents(path);
             try
             {
@@ -248,6 +279,7 @@ namespace BoomerangGuardian.EditorTools
             }
         }
 
+        /// <summary>Adds the arrow icon to the scene's player; followYaw = true so it shows the facing direction.</summary>
         private static void AddPlayerIcon(SetupUtils u, Transform player, int layer, Mesh arrow, Material material)
         {
             if (player.GetComponentInChildren<MinimapIcon>(true) != null)
@@ -260,7 +292,11 @@ namespace BoomerangGuardian.EditorTools
             u.Created("Player/MinimapIcon (arrow, turns with the player)");
         }
 
-        /// <summary>Icon root (MinimapIcon, keeps level and height) with a flat "Shape" child.</summary>
+        /// <summary>
+        /// Icon root (MinimapIcon, keeps level and height) with a flat "Shape" child.
+        /// The root carries the MinimapIcon so its LateUpdate can reset rotation to level every frame,
+        /// while the child keeps the shape's own scale and yaw. Everything goes on the Minimap layer.
+        /// </summary>
         private static GameObject CreateIcon(Transform parent, int layer, PrimitiveType shape, Mesh customMesh, Material material,
             Vector3 scale, float yaw, float height, bool followYaw)
         {
@@ -289,6 +325,7 @@ namespace BoomerangGuardian.EditorTools
             return icon;
         }
 
+        /// <summary>Icons are pure 2D markers: no shadows and no light / reflection probes (cheaper, and no shadow leaks into the world).</summary>
         private static void ConfigureIconRenderer(Renderer r)
         {
             r.shadowCastingMode = ShadowCastingMode.Off;
@@ -297,6 +334,10 @@ namespace BoomerangGuardian.EditorTools
             r.reflectionProbeUsage = ReflectionProbeUsage.Off;
         }
 
+        /// <summary>
+        /// Creates flat icons for the level geometry (ground, walls, platform) by copying each object's
+        /// world-space renderer bounds (center X/Z and size) onto a thin cube or disc at a fixed icon height.
+        /// </summary>
         private static void AddStaticIcons(SetupUtils u, Scene scene, int layer, Material ground, Material wall, Material platform)
         {
             Transform environment = SetupUtils.FindRoot(scene, "Environment");
@@ -329,10 +370,15 @@ namespace BoomerangGuardian.EditorTools
             GameObject go = SetupUtils.Visual(shape, parent, name, Vector3.zero, scale, material);
             go.transform.position = position;
             go.layer = layer;
-            go.isStatic = false;
+            go.isStatic = false;   // explicitly non-static: icons take no part in lightmapping or static batching
             ConfigureIconRenderer(go.GetComponent<Renderer>());
         }
 
+        /// <summary>
+        /// Second camera for the minimap: orthographic (no perspective distortion, like a map), looking
+        /// straight down (90° pitch), rendering only the Minimap layer into RT_Minimap. MinimapCamera
+        /// then follows the player at runtime.
+        /// </summary>
         private static void CreateMinimapCamera(SetupUtils u, Scene scene, int layer, RenderTexture texture, Transform player)
         {
             if (Object.FindFirstObjectByType<MinimapCamera>() != null)
@@ -344,18 +390,19 @@ namespace BoomerangGuardian.EditorTools
             GameObject go = u.FindOrCreate(scene, "Cameras/MinimapCamera");
             var cam = go.AddComponent<Camera>();
             cam.orthographic = true;
-            cam.orthographicSize = 30f;
+            cam.orthographicSize = 30f;   // half the visible height: a 60 m x 60 m area around the player
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.05f, 0.07f, 0.05f, 1f);
             cam.cullingMask = 1 << layer;
             cam.targetTexture = texture;
-            cam.depth = -10f;
+            cam.depth = -10f;   // renders before the main camera, so the texture is ready for the HUD
             cam.nearClipPlane = 1f;
             cam.farClipPlane = 100f;
             cam.allowHDR = false;
             cam.allowMSAA = false;
             go.transform.SetPositionAndRotation(new Vector3(0f, 60f, 0f), Quaternion.Euler(90f, 0f, 0f));
 
+            // URP per-camera settings: flat icons need no shadows or post-processing.
             var urp = cam.GetUniversalAdditionalCameraData();
             urp.renderShadows = false;
             urp.renderPostProcessing = false;
@@ -367,6 +414,7 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- UI ----------
 
+        /// <summary>HUD panel in the upper-right: a RawImage showing RT_Minimap, plus a color legend (TMP rich text).</summary>
         private static void BuildMinimapPanel(SetupUtils u, Transform canvas, RenderTexture texture)
         {
             if (canvas.Find("Panel_Minimap") != null)
@@ -378,6 +426,7 @@ namespace BoomerangGuardian.EditorTools
 
             var map = new GameObject("Minimap", typeof(RectTransform), typeof(RawImage)).GetComponent<RectTransform>();
             map.SetParent(panel, false);
+            // Anchored to the panel's top edge, full width minus 20 px (negative sizeDelta = inset), 320 px tall.
             map.anchorMin = new Vector2(0f, 1f);
             map.anchorMax = new Vector2(1f, 1f);
             map.pivot = new Vector2(0.5f, 1f);
@@ -399,6 +448,7 @@ namespace BoomerangGuardian.EditorTools
             u.Created("HUD/Panel_Minimap (upper-right, 320 px map + legend)");
         }
 
+        /// <summary>Top-center text where the JourneyController shows the current Hero's Journey stage and hint.</summary>
         private static TMP_Text BuildStagePanel(SetupUtils u, Transform canvas)
         {
             Transform existing = canvas.Find("Panel_Journey/Text_Stage");
@@ -414,6 +464,10 @@ namespace BoomerangGuardian.EditorTools
             return text;
         }
 
+        /// <summary>
+        /// Full-screen intro (story + controls + Begin button). Returns a tuple so Run can link both the
+        /// panel and the button; on reruns it returns the existing objects instead of building new ones.
+        /// </summary>
         private static (GameObject, Button) BuildIntroPanel(SetupUtils u, Transform canvas)
         {
             Transform existing = canvas.Find("Panel_Intro");
@@ -445,12 +499,17 @@ namespace BoomerangGuardian.EditorTools
             return (panel.gameObject, begin);
         }
 
+        /// <summary>
+        /// "Balance Restored" ending panel with a score summary and Continue / Quit buttons.
+        /// Created inactive; the JourneyController shows it at the end of the journey.
+        /// </summary>
         private static (GameObject, TMP_Text, Button, Button) BuildEndPanel(SetupUtils u, Transform canvas)
         {
             Transform existing = canvas.Find("Panel_End");
             if (existing != null)
             {
                 u.Skipped("HUD/Panel_End");
+                // Buttons come back in hierarchy order: Continue was created first, then Quit.
                 Button[] buttons = existing.GetComponentsInChildren<Button>(true);
                 return (existing.gameObject, existing.Find("Text_Summary")?.GetComponent<TMP_Text>(),
                     buttons.Length > 0 ? buttons[0] : null, buttons.Length > 1 ? buttons[1] : null);
@@ -467,6 +526,7 @@ namespace BoomerangGuardian.EditorTools
             return (panel.gameObject, summary, cont, quit);
         }
 
+        /// <summary>Colored background panel; anchor = pivot, so anchoredPosition is an offset from that point.</summary>
         private static RectTransform Panel(Transform parent, string name, Vector2 anchor, Vector2 position, Vector2 size, Color color)
         {
             var rt = new GameObject(name, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
@@ -478,6 +538,7 @@ namespace BoomerangGuardian.EditorTools
             return rt;
         }
 
+        /// <summary>TextMeshPro label with rich text (for &lt;b&gt; / &lt;color&gt; tags); raycastTarget off so it never blocks clicks.</summary>
         private static TMP_Text Text(Transform parent, string name, string content, float size, FontStyles style, TextAlignmentOptions alignment)
         {
             var rt = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
@@ -493,6 +554,7 @@ namespace BoomerangGuardian.EditorTools
             return text;
         }
 
+        /// <summary>Positions a text box relative to its parent's center.</summary>
         private static void Place(TMP_Text text, float x, float y, float width, float height)
         {
             RectTransform rt = text.rectTransform;
@@ -501,6 +563,7 @@ namespace BoomerangGuardian.EditorTools
             rt.sizeDelta = new Vector2(width, height);
         }
 
+        /// <summary>Fills the parent, inset by <paramref name="padding"/> horizontally and half of it vertically.</summary>
         private static void Stretch(RectTransform rt, float padding)
         {
             rt.anchorMin = Vector2.zero;
@@ -510,6 +573,10 @@ namespace BoomerangGuardian.EditorTools
             rt.offsetMax = new Vector2(-padding, -padding * 0.5f);
         }
 
+        /// <summary>
+        /// Orange UI Button with a dark label. ColorBlock is a struct, so it is copied, edited and
+        /// assigned back. Click handlers are added at runtime by the JourneyController, not here.
+        /// </summary>
         private static Button MakeButton(Transform parent, string name, string label, Vector2 position, Vector2 size)
         {
             var rt = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button)).GetComponent<RectTransform>();
@@ -530,6 +597,7 @@ namespace BoomerangGuardian.EditorTools
             return button;
         }
 
+        /// <summary>Saves the scene and assets, then returns the log plus the WiringValidator report.</summary>
         private static string Finish(SetupUtils u, Scene scene)
         {
             EditorSceneManager.MarkSceneDirty(scene);

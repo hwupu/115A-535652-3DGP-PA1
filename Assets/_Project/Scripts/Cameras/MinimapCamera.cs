@@ -27,9 +27,11 @@ namespace BoomerangGuardian.Cameras
         private void Awake()
         {
             minimapCamera = GetComponent<Camera>();
-            minimapCamera.orthographic = true;
+            minimapCamera.orthographic = true;   // no perspective: equal scale everywhere, like a real map
         }
 
+        // URP calls these static events for every camera each frame; we hook in to toggle fog
+        // only around this camera's render. Static events must be unsubscribed in OnDisable.
         private void OnEnable()
         {
             RenderPipelineManager.beginCameraRendering += OnBeginCamera;
@@ -45,7 +47,7 @@ namespace BoomerangGuardian.Cameras
         // Fog is a global render setting; the map camera looks down from far away, so fog would grey it out.
         private void OnBeginCamera(ScriptableRenderContext context, Camera cam)
         {
-            if (cam != minimapCamera) return;
+            if (cam != minimapCamera) return;   // the main camera keeps its fog
             fogWasOn = RenderSettings.fog;
             RenderSettings.fog = false;
         }
@@ -53,14 +55,18 @@ namespace BoomerangGuardian.Cameras
         private void OnEndCamera(ScriptableRenderContext context, Camera cam)
         {
             if (cam != minimapCamera) return;
-            RenderSettings.fog = fogWasOn;
+            RenderSettings.fog = fogWasOn;   // restore, so the next camera renders with the scene's fog
         }
 
+        // LateUpdate: follow the player after it has moved this frame.
         private void LateUpdate()
         {
             if (target == null) return;
+            // orthographicSize is half the vertical view height in world units.
             minimapCamera.orthographicSize = viewRadius;
             Vector3 p = target.position;
+            // Keep the player's x/z but a fixed height; pitch 90 degrees looks straight down.
+            // With yaw 0, world +Z (north) is the top of the map.
             float yaw = rotateWithTarget ? target.eulerAngles.y : 0f;
             transform.SetPositionAndRotation(new Vector3(p.x, height, p.z), Quaternion.Euler(90f, yaw, 0f));
         }

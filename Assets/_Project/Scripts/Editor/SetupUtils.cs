@@ -8,6 +8,10 @@ namespace BoomerangGuardian.EditorTools
     /// <summary>
     /// Helpers for idempotent setup scripts (ADR-0009): find-or-create assets and scene
     /// objects, and set serialized references, logging what was created or skipped.
+    /// Idempotent means running a setup menu twice gives the same result as running it once:
+    /// every helper first looks for the existing thing and only creates or links what is missing.
+    /// One instance is created per setup run; its <see cref="Log"/> is printed at the end
+    /// (+ created, ~ linked, = exists, ! warning).
     /// </summary>
     public class SetupUtils
     {
@@ -24,6 +28,7 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- Assets ----------
 
+        /// <summary>Creates an asset folder and any missing parents (recursive, like "mkdir -p").</summary>
         public void EnsureFolder(string path)
         {
             if (AssetDatabase.IsValidFolder(path)) return;
@@ -33,6 +38,7 @@ namespace BoomerangGuardian.EditorTools
             Created($"folder {path}");
         }
 
+        /// <summary>Loads _Project/Materials/{name}.mat, or creates a URP Lit material with this color.</summary>
         public Material GetOrCreateMaterial(string name, Color color)
         {
             string folder = $"{ProjectRoot}/Materials";
@@ -47,6 +53,7 @@ namespace BoomerangGuardian.EditorTools
             EnsureFolder(folder);
             Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
             material = new Material(shader) { name = name };
+            // URP shaders read _BaseColor; material.color sets _Color (built-in fallback). Set both.
             material.SetColor("_BaseColor", color);
             material.color = color;
             AssetDatabase.CreateAsset(material, path);
@@ -54,6 +61,7 @@ namespace BoomerangGuardian.EditorTools
             return material;
         }
 
+        /// <summary>Unlit variant for minimap icons: flat color, unaffected by scene lighting (night theme).</summary>
         public Material GetOrCreateUnlitMaterial(string name, Color color)
         {
             string folder = $"{ProjectRoot}/Materials/Minimap";
@@ -85,6 +93,8 @@ namespace BoomerangGuardian.EditorTools
                 return existing;
             }
 
+            // Layers live in ProjectSettings/TagManager.asset; there is no public API to add one,
+            // so edit its "layers" array through SerializedObject. Slots 0–7 are reserved by Unity.
             var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
             SerializedProperty layers = tagManager.FindProperty("layers");
             for (int i = 8; i < layers.arraySize; i++)
@@ -100,6 +110,7 @@ namespace BoomerangGuardian.EditorTools
             return -1;
         }
 
+        /// <summary>Puts an object and all its children (inactive too) on a layer, e.g. Minimap icons.</summary>
         public static void SetLayerRecursively(GameObject go, int layer)
         {
             foreach (Transform t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = layer;
@@ -117,6 +128,7 @@ namespace BoomerangGuardian.EditorTools
                 Transform next = current == null ? FindRoot(scene, parts[i]) : current.Find(parts[i]);
                 if (next == null)
                 {
+                    // Register with Undo so the setup run can be undone (Ctrl/Cmd+Z) and the scene is marked dirty.
                     var go = new GameObject(parts[i]);
                     Undo.RegisterCreatedObjectUndo(go, "Setup");
                     SceneManager.MoveGameObjectToScene(go, scene);
@@ -129,6 +141,7 @@ namespace BoomerangGuardian.EditorTools
             return current.gameObject;
         }
 
+        /// <summary>Finds a top-level object by name in one scene (works for inactive objects, unlike GameObject.Find).</summary>
         public static Transform FindRoot(Scene scene, string name)
         {
             foreach (GameObject root in scene.GetRootGameObjects())
@@ -136,6 +149,7 @@ namespace BoomerangGuardian.EditorTools
             return null;
         }
 
+        /// <summary>Returns the existing component of type T, or adds one (with Undo support).</summary>
         public T GetOrAdd<T>(GameObject go) where T : Component
         {
             if (go.TryGetComponent(out T existing))
@@ -151,6 +165,8 @@ namespace BoomerangGuardian.EditorTools
         /// <summary>Sets an object reference field only if it is empty (never overwrites user wiring).</summary>
         public void LinkIfEmpty(Object owner, string field, Object value)
         {
+            // Private [SerializeField] fields cannot be set from outside in C#, but SerializedObject
+            // can, by field name, the same way the Inspector does. It also records Undo and marks dirty.
             var so = new SerializedObject(owner);
             SerializedProperty prop = so.FindProperty(field);
             if (prop == null)
@@ -185,6 +201,7 @@ namespace BoomerangGuardian.EditorTools
         {
             GameObject go = GameObject.CreatePrimitive(type);
             go.name = name;
+            // CreatePrimitive adds a collider; physics belongs on the prefab root (project prefab convention).
             Object.DestroyImmediate(go.GetComponent<Collider>());
             go.transform.SetParent(parent, false);
             go.transform.localPosition = localPosition;

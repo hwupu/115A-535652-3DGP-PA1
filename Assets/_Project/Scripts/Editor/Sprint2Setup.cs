@@ -21,6 +21,13 @@ namespace BoomerangGuardian.EditorTools
     /// <summary>
     /// Sprint 2 setup (ADR-0009). Idempotent: safe to run again; it only creates what is missing
     /// and never overwrites references you already set.
+    /// It builds the core game loop in Main.unity:
+    /// - greybox prefabs (Target, two Obstacles, Collectible, kinematic Boomerang) and the SpawnConfig asset,
+    /// - the default StreamingAssets/config.json (ADR-0008),
+    /// - scene systems: ConfigLoader + ScoreManager, SpawnManager, GuardianPlatform trigger, AudioManager,
+    /// - player components: Hand, BoomerangThrower, TargetSelector,
+    /// - the HUD canvas (HudController) and an EventSystem for the Input System.
+    /// Every step logs created / linked / skipped, and the report ends with the WiringValidator result.
     /// Menu: Boomerang Guardian → Setup → Sprint 2 (Core Loop)
     /// Batch: Unity -batchmode -quit -projectPath . -executeMethod BoomerangGuardian.EditorTools.Sprint2Setup.RunBatch
     /// </summary>
@@ -31,9 +38,11 @@ namespace BoomerangGuardian.EditorTools
         private const string SpawnConfigPath = SetupUtils.ProjectRoot + "/Settings/SpawnConfig.asset";
         private const string StreamingConfigPath = "Assets/StreamingAssets/" + ConfigLoader.FileName;
 
+        /// <summary>Menu entry: refuses to run in Play Mode and lets the user save open scene changes first.</summary>
         [MenuItem("Boomerang Guardian/Setup/Sprint 2 (Core Loop)")]
         public static void RunFromMenu()
         {
+            // Edits made in Play Mode are thrown away when Play stops, so setup only runs in Edit Mode.
             if (Application.isPlaying)
             {
                 EditorUtility.DisplayDialog("Sprint 2 setup", "Exit Play Mode first.", "OK");
@@ -47,10 +56,13 @@ namespace BoomerangGuardian.EditorTools
             Debug.Log(log);
         }
 
+        /// <summary>Entry point for -executeMethod (no dialogs, so it works in -batchmode).</summary>
         public static void RunBatch() => Debug.Log(Run());
 
+        /// <summary>Runs all steps and returns the text report.</summary>
         private static string Run()
         {
+            // SetupUtils collects the log and provides the find-or-create helpers.
             var u = new SetupUtils();
 
             // Open the scene first: OpenScene unloads unused assets, which would invalidate
@@ -59,6 +71,8 @@ namespace BoomerangGuardian.EditorTools
             if (scene.path != MainScenePath) scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
 
             // ---------- Assets ----------
+            // Greybox prefabs follow the prefab convention: root pivot at the ground contact,
+            // Rigidbody + collider + gameplay component on the root, visuals in a "Model" child.
             u.EnsureFolder(PrefabFolder);
             Material mTarget = u.GetOrCreateMaterial("M_Target", new Color(0.85f, 0.2f, 0.2f));
             Material mTargetBand = u.GetOrCreateMaterial("M_TargetBand", new Color(0.95f, 0.95f, 0.95f));
@@ -80,6 +94,7 @@ namespace BoomerangGuardian.EditorTools
                 SetupUtils.Visual(PrimitiveType.Cylinder, root.transform, "Band", new Vector3(0f, 0.6f, 0f), new Vector3(0.82f, 0.1f, 0.82f), mTargetBand);
             });
 
+            // Obstacles are dynamic bodies too; heavier masses make them harder to push around.
             Obstacle cratePrefab = GetOrCreatePrefab<Obstacle>(u, "Obstacle_Crate", root =>
             {
                 AddRigidbody(root, 15f);
@@ -100,6 +115,8 @@ namespace BoomerangGuardian.EditorTools
                 SetupUtils.Visual(PrimitiveType.Cube, root.transform, "Model", new Vector3(0f, 1f, 0f), new Vector3(1f, 2f, 1f), mRock);
             });
 
+            // Collectible: no Rigidbody, only a trigger collider, so the player walks through it and
+            // OnTriggerEnter fires (the player's own Rigidbody is enough for trigger events).
             Collectible collectiblePrefab = GetOrCreatePrefab<Collectible>(u, "Collectible_Gem", root =>
             {
                 var col = root.AddComponent<SphereCollider>();
@@ -111,6 +128,9 @@ namespace BoomerangGuardian.EditorTools
                 SetupUtils.SetValue(collectible, "visual", p => p.objectReferenceValue = model.transform);
             });
 
+            // Boomerang: kinematic Rigidbody + trigger collider. Its path is scripted (Bézier curve), not
+            // simulated, so physics must not push it; the trigger still reports what it touches.
+            // The "Spinner" child is rotated for the spin effect without affecting the flight path.
             BoomerangProjectile boomerangPrefab = GetOrCreatePrefab<BoomerangProjectile>(u, "Boomerang", root =>
             {
                 var body = root.AddComponent<Rigidbody>();
@@ -127,10 +147,12 @@ namespace BoomerangGuardian.EditorTools
                 SetupUtils.SetValue(projectile, "spinner", p => p.objectReferenceValue = spinner);
             });
 
+            // SpawnConfig (ScriptableObject) holds the prefab lists, so gameplay code never names art assets.
             SpawnConfig spawnConfig = GetOrCreateSpawnConfig(u, targetPrefab, new[] { cratePrefab, rockPrefab }, collectiblePrefab);
             EnsureStreamingConfig(u);
 
             // ---------- Scene ----------
+            // Find existing objects by component type (not by name or tag), as the project convention says.
             PlayerMotor motor = Object.FindFirstObjectByType<PlayerMotor>();
             CameraRig rig = Object.FindFirstObjectByType<CameraRig>();
             if (motor == null || rig == null)
@@ -141,14 +163,15 @@ namespace BoomerangGuardian.EditorTools
             GameObject player = motor.gameObject;
             var input = player.GetComponent<PlayerInputReader>();
 
-            // Systems
+            // Systems: reuse the ApplicationController's object as the GameManager if it exists.
             ApplicationController app = Object.FindFirstObjectByType<ApplicationController>();
             GameObject gameManager = app != null ? app.gameObject : u.FindOrCreate(scene, "Systems/GameManager");
             var configLoader = u.GetOrAdd<ConfigLoader>(gameManager);
             u.LinkIfEmpty(configLoader, "input", input);
             var scoreManager = u.GetOrAdd<ScoreManager>(gameManager);
 
-            // Spawn manager
+            // Spawn manager. Remember whether it is new: the spawn region is only computed on first
+            // creation, so a region the user tuned later is never overwritten.
             GameObject spawnerGo = u.FindOrCreate(scene, "Systems/SpawnManager");
             bool newSpawner = !spawnerGo.TryGetComponent(out SpawnManager _);
             var spawner = u.GetOrAdd<SpawnManager>(spawnerGo);
@@ -160,6 +183,7 @@ namespace BoomerangGuardian.EditorTools
             u.LinkIfEmpty(spawner, "player", player.transform);
             if (newSpawner && ground != null && ground.TryGetComponent(out Renderer groundRenderer))
             {
+                // World-space bounds of the ground mesh: center on its top surface (max.y), size in X and Z.
                 Bounds b = groundRenderer.bounds;
                 SetupUtils.SetValue(spawner, "regionCenter", p => p.vector3Value = new Vector3(b.center.x, b.max.y, b.center.z));
                 SetupUtils.SetValue(spawner, "regionSize", p => p.vector2Value = new Vector2(b.size.x, b.size.z));
@@ -171,6 +195,7 @@ namespace BoomerangGuardian.EditorTools
             if (platformTrigger != null) u.LinkIfEmpty(platformTrigger, "spawnManager", spawner);
 
             // Player: hand, thrower, selector
+            // "Hand" is the boomerang spawn / catch point (later re-parented to the witch's hand bone).
             Transform hand = player.transform.Find("Hand");
             if (hand == null)
             {
@@ -191,13 +216,15 @@ namespace BoomerangGuardian.EditorTools
             u.LinkIfEmpty(selector, "thrower", thrower);
             if (newSelector)
             {
+                // Layer mask bit math: (1 << layer) is the Player bit, ~ inverts it,
+                // so the mouse pick ray hits every layer except the player. ~0 = all layers.
                 int playerLayer = LayerMask.NameToLayer("Player");
                 int mask = playerLayer >= 0 ? ~(1 << playerLayer) : ~0;
                 SetupUtils.SetValue(selector, "pickMask", p => p.intValue = mask);
                 if (playerLayer < 0) u.Warn("Layer 'Player' not found: the pick ray may hit the player.");
             }
 
-            // Audio
+            // Audio: the AudioManager gets references to the event sources it listens to.
             GameObject audioGo = u.FindOrCreate(scene, "Systems/AudioManager");
             var audio = u.GetOrAdd<AudioManager>(audioGo);   // RequireComponent adds the AudioSource
             u.LinkIfEmpty(audio, "thrower", thrower);
@@ -213,6 +240,11 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- Prefabs ----------
 
+        /// <summary>
+        /// Loads the prefab if it already exists; otherwise builds a temporary GameObject with
+        /// <paramref name="build"/>, saves it as a prefab asset and destroys the temporary object.
+        /// Returns the prefab's component of type T (what SpawnConfig and the thrower reference).
+        /// </summary>
         private static T GetOrCreatePrefab<T>(SetupUtils u, string name, System.Action<GameObject> build) where T : Component
         {
             string path = $"{PrefabFolder}/{name}.prefab";
@@ -231,6 +263,7 @@ namespace BoomerangGuardian.EditorTools
             return prefab.GetComponent<T>();
         }
 
+        /// <summary>Adds a dynamic (non-kinematic) Rigidbody, so the object can be pushed and knocked over.</summary>
         private static void AddRigidbody(GameObject go, float mass)
         {
             var body = go.AddComponent<Rigidbody>();
@@ -249,6 +282,8 @@ namespace BoomerangGuardian.EditorTools
 
             config = ScriptableObject.CreateInstance<SpawnConfig>();
             AssetDatabase.CreateAsset(config, SpawnConfigPath);
+            // The prefab lists are private [SerializeField] fields, so they are filled through
+            // SerializedObject (the same path the Inspector uses).
             var so = new SerializedObject(config);
             SetArray(so.FindProperty("targetPrefabs"), target);
             SetArray(so.FindProperty("obstaclePrefabs"), obstacles);
@@ -265,6 +300,10 @@ namespace BoomerangGuardian.EditorTools
                 array.GetArrayElementAtIndex(i).objectReferenceValue = items[i];
         }
 
+        /// <summary>
+        /// Writes StreamingAssets/config.json from a default GameConfig (ADR-0008) if the file is missing.
+        /// StreamingAssets is copied as-is into builds, so players can edit the tunables without rebuilding.
+        /// </summary>
         private static void EnsureStreamingConfig(SetupUtils u)
         {
             if (File.Exists(StreamingConfigPath))
@@ -280,6 +319,7 @@ namespace BoomerangGuardian.EditorTools
 
         // ---------- Scene helpers ----------
 
+        /// <summary>Depth-first search of the scene (including inactive objects) for the first Transform with this name.</summary>
         private static Transform FindByName(Scene scene, string name)
         {
             foreach (GameObject root in scene.GetRootGameObjects())
@@ -291,6 +331,11 @@ namespace BoomerangGuardian.EditorTools
             return null;
         }
 
+        /// <summary>
+        /// Creates the trigger volume that detects the player standing on the Guardian Platform
+        /// (GuardianPlatform raises PlayerEntered / PlayerExited, which the HUD, audio and journey listen to;
+        /// it also holds a reference to the SpawnManager, linked in Run).
+        /// </summary>
         private static GuardianPlatform GetOrCreatePlatformTrigger(SetupUtils u, Scene scene, Transform platformVisual)
         {
             GuardianPlatform existing = Object.FindFirstObjectByType<GuardianPlatform>();
@@ -313,6 +358,8 @@ namespace BoomerangGuardian.EditorTools
             Vector3 s = platformVisual.lossyScale;
             go.transform.localScale = new Vector3(s.x * 0.95f, 1.5f, s.z * 0.95f);   // 3 m tall, just inside the disc edge
 
+            // Borrow Unity's built-in cylinder mesh from a throwaway primitive. A MeshCollider must be
+            // convex to be a trigger; Unity has no cylinder collider, and a capsule would bulge at the ends.
             GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             Mesh cylinder = temp.GetComponent<MeshFilter>().sharedMesh;
             Object.DestroyImmediate(temp);
@@ -326,6 +373,10 @@ namespace BoomerangGuardian.EditorTools
             return platform;
         }
 
+        /// <summary>
+        /// UI buttons need an EventSystem. InputSystemUIInputModule (not the legacy StandaloneInputModule)
+        /// is used because the project runs on the Input System package.
+        /// </summary>
         private static void EnsureEventSystem(SetupUtils u, Scene scene)
         {
             if (Object.FindFirstObjectByType<EventSystem>() != null)
@@ -338,6 +389,10 @@ namespace BoomerangGuardian.EditorTools
             go.AddComponent<InputSystemUIInputModule>();
         }
 
+        /// <summary>
+        /// Builds the HUD canvas once (stats, cooldown bar, message line), then links the HudController
+        /// to the systems whose events and state it displays. Links are filled even if the HUD already exists.
+        /// </summary>
         private static void BuildHud(SetupUtils u, Scene scene, ScoreManager score, SpawnManager spawner, PlayerMotor motor,
             CameraRig rig, BoomerangThrower thrower, TargetSelector selector, GuardianPlatform platform)
         {
@@ -353,6 +408,8 @@ namespace BoomerangGuardian.EditorTools
                 }
 
                 GameObject canvasGo = u.FindOrCreate(scene, "UI/HUD");
+                // Screen Space Overlay + Scale With Screen Size (1920x1080 reference, 0.5 width/height match)
+                // keeps the layout proportional at any window size.
                 var canvas = canvasGo.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 var scaler = canvasGo.AddComponent<CanvasScaler>();
@@ -368,7 +425,8 @@ namespace BoomerangGuardian.EditorTools
                 TMP_Text targetsText = Label(stats, "Text_Targets", "Targets hit: 0", 26, FontStyles.Normal, new Vector2(20f, -80f), new Vector2(480f, 36f));
                 TMP_Text statusText = Label(stats, "Text_Status", "Speed: Normal", 22, FontStyles.Normal, new Vector2(20f, -122f), new Vector2(480f, 32f));
 
-                // Cooldown bar (bottom-center)
+                // Cooldown bar (bottom-center). "Fill" stretches over the bar with a 4 px inset;
+                // the HudController moves its anchorMax.x from 0 to 1 as the cooldown recovers.
                 RectTransform bar = Panel(canvasGo.transform, "Panel_Cooldown", new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(380f, 48f));
                 var fill = new GameObject("Fill", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
                 fill.SetParent(bar, false);
@@ -389,6 +447,7 @@ namespace BoomerangGuardian.EditorTools
                 mr.anchoredPosition = new Vector2(0f, -200f);
                 message.alignment = TextAlignmentOptions.Center;
 
+                // SetValue (unconditional) is safe here because the HudController was just created.
                 SetupUtils.SetValue(hud, "scoreText", p => p.objectReferenceValue = scoreText);
                 SetupUtils.SetValue(hud, "targetsText", p => p.objectReferenceValue = targetsText);
                 SetupUtils.SetValue(hud, "statusText", p => p.objectReferenceValue = statusText);
@@ -411,6 +470,10 @@ namespace BoomerangGuardian.EditorTools
             u.LinkIfEmpty(hud, "platform", platform);
         }
 
+        /// <summary>
+        /// Semi-transparent background panel. Anchor and pivot share the same point (e.g. top-left),
+        /// so anchoredPosition is an offset from that screen corner.
+        /// </summary>
         private static RectTransform Panel(Transform parent, string name, Vector2 anchor, Vector2 position, Vector2 size)
         {
             var rt = new GameObject(name, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
@@ -422,6 +485,10 @@ namespace BoomerangGuardian.EditorTools
             return rt;
         }
 
+        /// <summary>
+        /// TextMeshPro label anchored at the parent's top-left. raycastTarget is off so text never
+        /// blocks mouse clicks meant for the game world.
+        /// </summary>
         private static TMP_Text Label(Transform parent, string name, string text, float size, FontStyles style, Vector2 position, Vector2 boxSize)
         {
             var rt = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
@@ -438,6 +505,7 @@ namespace BoomerangGuardian.EditorTools
             return label;
         }
 
+        /// <summary>Makes the rect fill its parent completely (anchors 0..1, zero offsets).</summary>
         private static void Stretch(RectTransform rt)
         {
             rt.anchorMin = Vector2.zero;
@@ -446,6 +514,7 @@ namespace BoomerangGuardian.EditorTools
             rt.offsetMin = rt.offsetMax = Vector2.zero;
         }
 
+        /// <summary>Saves the scene and assets, then returns the log plus the WiringValidator report.</summary>
         private static string Finish(SetupUtils u, Scene scene)
         {
             EditorSceneManager.MarkSceneDirty(scene);

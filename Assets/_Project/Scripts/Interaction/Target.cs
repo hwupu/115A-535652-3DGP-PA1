@@ -17,11 +17,15 @@ namespace BoomerangGuardian.Interaction
     /// <summary>
     /// A target object (PB-10). It can be selected by ray casting and hit by a boomerang.
     /// When hit: it is pushed away by an impulse, stays visible for 2 seconds, then disappears.
-    /// How it reacts in those 2 seconds is chosen per prefab (<see cref="HitReaction"/>).
+    /// How it reacts in those 2 seconds is chosen per prefab (<see cref="HitReaction"/>, ADR-0010).
+    /// Hit by BoomerangProjectile; picked by <see cref="TargetSelector"/> via its AimPoint.
+    /// Raises the static <see cref="AnyHit"/> event, which ScoreManager (score) and JourneyController
+    /// (story stage) listen to, so they don't need a reference to every spawned target.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class Target : MonoBehaviour
     {
+        // Shader property IDs are cached once: setting colors by int ID is faster than by string name.
         private static readonly int ColorId = Shader.PropertyToID("_Color");
 
         [Tooltip("Seconds the target stays visible after being hit (spec: 2 s).")]
@@ -41,9 +45,13 @@ namespace BoomerangGuardian.Interaction
                  "Referencing it keeps the transparent shader variant in builds.")]
         [SerializeField, OptionalReference] private Material fadeMaterialTemplate;
 
-        /// <summary>Raised whenever any target is hit (used for scoring and audio).</summary>
+        /// <summary>
+        /// Raised whenever any target is hit (used for scoring and the story stage; the hit sound
+        /// comes from BoomerangThrower.TargetHit). Static, so listeners subscribe once for all targets.
+        /// </summary>
         public static event Action<Target> AnyHit;
 
+        /// <summary>True once hit; makes the target unselectable and prevents double scoring.</summary>
         public bool IsHit { get; private set; }
 
         /// <summary>World-space point to aim at: the center of the target's colliders.</summary>
@@ -51,6 +59,8 @@ namespace BoomerangGuardian.Interaction
         {
             get
             {
+                // The root pivot sits on the ground, so aim at the colliders' combined AABB center instead.
+                // Computed live, so it follows the target while it moves or is pushed.
                 if (colliders.Length == 0) return transform.position + Vector3.up * 0.5f;
                 Bounds bounds = colliders[0].bounds;
                 for (int i = 1; i < colliders.Length; i++) bounds.Encapsulate(colliders[i].bounds);
@@ -66,6 +76,7 @@ namespace BoomerangGuardian.Interaction
         private readonly List<Color> fadeBaseColors = new List<Color>();
         private readonly List<Color> fadeEmissionColors = new List<Color>();
 
+        // Static events survive between Play sessions when Domain Reload is off; clear stale subscribers on start.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() => AnyHit = null;
 
@@ -83,44 +94,56 @@ namespace BoomerangGuardian.Interaction
             if (IsHit) return false;
             IsHit = true;
 
-            body.WakeUp();
+            body.WakeUp();   // a resting Rigidbody may be asleep and would ignore forces
             hitTime = Time.time;
             if (hitReaction == HitReaction.FloatAway) StartFloatAway(impulse);
             else
             {
+                // ForceMode.Impulse = instant change of momentum (N·s), mass-aware. Applying it at the
+                // contact point (off the center of mass) also adds torque, so the target tumbles.
                 body.AddForceAtPosition(impulse, point, ForceMode.Impulse);   // push + a little spin
                 ApplyTint(iconsOnly: false);
             }
 
             AnyHit?.Invoke(this);
+            // Destroy with a delay: the target stays visible for disappearDelay (spec: 2 s), no coroutine needed.
             Destroy(gameObject, disappearDelay);
             return true;
         }
 
+        /// <summary>
+        /// FloatAway setup: no gravity, drag so the push eases out, upright spin, then a steady rise
+        /// (FixedUpdate) and a fade (Update) until the delayed Destroy.
+        /// </summary>
         private void StartFloatAway(Vector3 impulse)
         {
             floating = true;
             body.useGravity = false;
-            body.linearDamping = floatDrag;
+            body.linearDamping = floatDrag;   // Unity 6 name for the old Rigidbody.drag
             body.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;   // stay upright
 
             Vector3 push = impulse;
-            push.y = Mathf.Max(push.y, 0f);
+            push.y = Mathf.Max(push.y, 0f);   // never push a ghost downward
             body.AddForce(push, ForceMode.Impulse);   // still "pushed away" (spec), then it rises
-            body.angularVelocity = Vector3.up * (floatSpin * Mathf.Deg2Rad);
+            body.angularVelocity = Vector3.up * (floatSpin * Mathf.Deg2Rad);   // angularVelocity is in rad/s
 
             ApplyTint(iconsOnly: true);   // the minimap dot turns grey
             PrepareFade();
         }
 
+        // Continuous forces belong in FixedUpdate (once per physics step). ForceMode.Acceleration
+        // ignores mass, so every ghost rises at the same rate regardless of its Rigidbody mass.
         private void FixedUpdate()
         {
             if (floating) body.AddForce(Vector3.up * riseAcceleration, ForceMode.Acceleration);
         }
 
+        // The fade is visual only, so it runs per rendered frame in Update.
         private void Update()
         {
             if (!floating || fadeMaterials.Count == 0) return;
+            // t goes 0 → 1 over disappearDelay; SmoothStep eases in and out, so alpha fades 1 → 0 smoothly
+            // and reaches 0 right when the delayed Destroy fires.
             float t = disappearDelay > 0f ? Mathf.Clamp01((Time.time - hitTime) / disappearDelay) : 1f;
             float alpha = 1f - Mathf.SmoothStep(0f, 1f, t);
             for (int i = 0; i < fadeMaterials.Count; i++)
@@ -132,7 +155,13 @@ namespace BoomerangGuardian.Interaction
             }
         }
 
-        /// <summary>Gives every visual renderer its own transparent copy of its material.</summary>
+        /// <summary>
+        /// Gives every visual renderer its own transparent copy of its material.
+        /// Imported materials are opaque and can't fade. Preferred path: copy the transparent template
+        /// (M_TargetFade) and copy the original textures/colors onto it; referencing the template keeps
+        /// its transparent shader variant in builds (ADR-0010). Fallback: convert a copy at runtime.
+        /// Per-target copies are needed so fading one ghost doesn't fade every ghost sharing the material.
+        /// </summary>
         private void PrepareFade()
         {
             if (fadeMaterialTemplate == null)
@@ -141,7 +170,7 @@ namespace BoomerangGuardian.Interaction
 
             foreach (Renderer r in GetComponentsInChildren<Renderer>())
             {
-                if (IsIcon(r)) continue;
+                if (IsIcon(r)) continue;   // the minimap icon keeps its own (grey-tinted) look
                 Material[] materials = r.sharedMaterials;
                 for (int i = 0; i < materials.Length; i++)
                 {
@@ -160,6 +189,7 @@ namespace BoomerangGuardian.Interaction
                         MaterialUtility.MakeTransparent(fade);
                     }
 
+                    // Remember the starting colors; Update scales them by alpha each frame.
                     materials[i] = fade;
                     fadeMaterials.Add(fade);
                     fadeBaseColors.Add(fade.HasProperty(MaterialUtility.BaseColor) ? fade.GetColor(MaterialUtility.BaseColor) : Color.white);
@@ -175,6 +205,10 @@ namespace BoomerangGuardian.Interaction
             foreach (Material m in fadeMaterials) Destroy(m);   // runtime copies: avoid leaking materials
         }
 
+        /// <summary>
+        /// Tints renderers with hitTint via a MaterialPropertyBlock: a per-renderer override that leaves
+        /// the shared material asset untouched and creates no material copies.
+        /// </summary>
         private void ApplyTint(bool iconsOnly)
         {
             var block = new MaterialPropertyBlock();
@@ -188,6 +222,7 @@ namespace BoomerangGuardian.Interaction
             }
         }
 
+        /// <summary>True for the minimap icon renderer (a child with <see cref="MinimapIcon"/>).</summary>
         private static bool IsIcon(Renderer r) => r.GetComponentInParent<MinimapIcon>() != null;
     }
 }

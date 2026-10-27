@@ -8,6 +8,13 @@ namespace BoomerangGuardian.Player
     /// Single entry point for player input (ADR-0003).
     /// Wraps the "Player" map of PlayerControls.inputactions and exposes polled values
     /// plus button events, so gameplay scripts never touch the Input System directly.
+    /// Two styles of input:
+    /// - Continuous values (Move, LookDelta, Zoom, PointerPosition, held buttons) are polled
+    ///   when needed by PlayerMotor, CameraRig, TargetSelector and TrajectoryPreview.
+    /// - One-shot buttons are C# events: PlayerMotor (SPACE speed, F jump), CameraRig (V view),
+    ///   TargetSelector (LMB select), ApplicationController (ESC quit), ConfigLoader (F5 reload);
+    ///   JourneyController also listens to Jump for tutorial progress.
+    /// JourneyController calls <see cref="SetGameplayEnabled"/> to pause gameplay input while a panel is open.
     /// </summary>
     public class PlayerInputReader : MonoBehaviour
     {
@@ -17,6 +24,8 @@ namespace BoomerangGuardian.Player
         [Tooltip("Action map to read from.")]
         [SerializeField] private string actionMapName = "Player";
 
+        // Button events. Listeners subscribe in their OnEnable and unsubscribe in OnDisable,
+        // so a destroyed listener is never called. The reader itself does not know who listens.
         public event Action ToggleSpeedPressed;
         public event Action JumpPressed;
         public event Action SwitchViewPressed;
@@ -45,13 +54,18 @@ namespace BoomerangGuardian.Player
         /// <summary>Scroll wheel delta this frame (positive = away from the user).</summary>
         public float Zoom => GameplayEnabled && zoom != null ? zoom.ReadValue<float>() : 0f;
 
-        /// <summary>Cursor position in screen pixels, used for ray casting.</summary>
+        /// <summary>
+        /// Cursor position in screen pixels, used for ray casting (click-to-throw and hover preview).
+        /// Not gated by GameplayEnabled; callers check that themselves.
+        /// </summary>
         public Vector2 PointerPosition => point != null ? point.ReadValue<Vector2>() : Vector2.zero;
 
         private InputActionMap map;
         private InputAction move, look, lookHold, orbitHold, zoom, point;
         private InputAction toggleSpeed, jump, switchView, select, quit, reloadConfig;
 
+        // Awake runs before any OnEnable/Start, so the actions are looked up once here,
+        // before other scripts can poll them. throwIfNotFound: a typo in an action name fails loudly.
         private void Awake()
         {
             if (actions == null)
@@ -80,6 +94,7 @@ namespace BoomerangGuardian.Player
         {
             if (map == null) return;
 
+            // "performed" fires once per button press. Actions only produce input after map.Enable().
             toggleSpeed.performed += OnToggleSpeed;
             jump.performed += OnJump;
             switchView.performed += OnSwitchView;
@@ -93,6 +108,7 @@ namespace BoomerangGuardian.Player
         {
             if (map == null) return;
 
+            // Mirror of OnEnable: stop the map and remove every handler, so nothing leaks.
             map.Disable();
             toggleSpeed.performed -= OnToggleSpeed;
             jump.performed -= OnJump;
@@ -102,8 +118,13 @@ namespace BoomerangGuardian.Player
             reloadConfig.performed -= OnReloadConfig;
         }
 
+        /// <summary>
+        /// Turns gameplay input on/off (menus call this together with Time.timeScale = 0).
+        /// The action map stays enabled, so ESC and F5 still work while paused.
+        /// </summary>
         public void SetGameplayEnabled(bool value) => GameplayEnabled = value;
 
+        // Gameplay buttons are dropped while a menu is open; Quit and ReloadConfig always pass through.
         private void OnToggleSpeed(InputAction.CallbackContext _) { if (GameplayEnabled) ToggleSpeedPressed?.Invoke(); }
         private void OnJump(InputAction.CallbackContext _) { if (GameplayEnabled) JumpPressed?.Invoke(); }
         private void OnSwitchView(InputAction.CallbackContext _) { if (GameplayEnabled) SwitchViewPressed?.Invoke(); }

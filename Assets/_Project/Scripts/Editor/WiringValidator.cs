@@ -11,6 +11,9 @@ namespace BoomerangGuardian.EditorTools
     /// Fields marked [OptionalReference] may stay empty. Added after a missing link
     /// (PlayerMotor.cameraRig) went unnoticed for two sprints (Sprint 4, PB-26).
     /// Menu: Boomerang Guardian → Validate Wiring. Also runs at the end of every setup script.
+    /// How: for each of our MonoBehaviours, iterate its serialized properties (what the Inspector
+    /// shows) and report every empty object reference that is not marked optional (checked via reflection).
+    /// It only reports; it never changes the scene or prefabs.
     /// </summary>
     public static class WiringValidator
     {
@@ -27,14 +30,16 @@ namespace BoomerangGuardian.EditorTools
                 problems == 0 ? "All required references are set." : $"{problems} empty reference(s). See the Console for details.", "OK");
         }
 
+        /// <summary>Report text only (used by setup scripts, which append it to their log).</summary>
         public static string Report() => Report(out _);
 
+        /// <summary>Checks the open scenes and all project prefabs; returns the report and the problem count.</summary>
         public static string Report(out int problems)
         {
             var sb = new StringBuilder("\nWiring check:\n");
             problems = 0;
 
-            // Scene objects
+            // Scene objects (including inactive ones, e.g. hidden UI panels)
             foreach (MonoBehaviour behaviour in Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 problems += Check(behaviour, $"scene: {Path(behaviour != null ? behaviour.transform : null)}", sb);
 
@@ -52,20 +57,27 @@ namespace BoomerangGuardian.EditorTools
             return sb.ToString();
         }
 
+        /// <summary>Counts and logs the empty required object references on one component.</summary>
         private static int Check(MonoBehaviour behaviour, string where, StringBuilder sb)
         {
+            // null = a "Missing Script" slot (the script file was deleted or renamed).
             if (behaviour == null) return 0;
             System.Type type = behaviour.GetType();
+            // Only our own scripts; third-party and Unity components are not our wiring.
             if (type.Namespace == null || !type.Namespace.StartsWith("BoomerangGuardian")) return 0;
 
             int problems = 0;
+            // SerializedObject sees the same fields the Inspector shows ([SerializeField] private included).
             var so = new SerializedObject(behaviour);
             SerializedProperty prop = so.GetIterator();
             bool enterChildren = true;
+            // Walk the top-level properties: enter children only on the first call (to get inside
+            // the root), then stay at field level.
             while (prop.NextVisible(enterChildren))
             {
                 enterChildren = false;
                 if (prop.propertyType != SerializedPropertyType.ObjectReference || prop.objectReferenceValue != null) continue;
+                // m_Script is Unity's built-in reference to the script asset, not one of our fields.
                 if (prop.name == "m_Script" || IsOptional(type, prop.name)) continue;
 
                 problems++;
@@ -74,6 +86,10 @@ namespace BoomerangGuardian.EditorTools
             return problems;
         }
 
+        /// <summary>
+        /// Reflection lookup: does the C# field carry [OptionalReference]? Walks up the base classes
+        /// because GetField with NonPublic does not return private fields declared in a base class.
+        /// </summary>
         private static bool IsOptional(System.Type type, string fieldName)
         {
             for (System.Type t = type; t != null && t != typeof(MonoBehaviour); t = t.BaseType)
@@ -84,6 +100,7 @@ namespace BoomerangGuardian.EditorTools
             return false;
         }
 
+        /// <summary>Hierarchy path like "Root/Child/Object" so the report says exactly where to look.</summary>
         private static string Path(Transform t)
         {
             if (t == null) return "?";

@@ -9,6 +9,10 @@ namespace BoomerangGuardian.Audio
     /// Plays the game's sound effects (PB-16). The five required ones are throw, hit,
     /// invalid selection, enter platform and leave platform (+ collect and catch).
     /// Any empty clip slot uses a synthesized placeholder tone, so the game is never silent.
+    /// Event-driven: it never polls. It subscribes to BoomerangThrower (Thrown, TargetHit,
+    /// ObstacleHit, Caught), TargetSelector.SelectionRejected, GuardianPlatform
+    /// (PlayerEntered, PlayerExited) and the static Collectible.AnyCollected. Gameplay code
+    /// therefore does not know that audio exists (loose coupling).
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : MonoBehaviour
@@ -32,14 +36,20 @@ namespace BoomerangGuardian.Audio
         [SerializeField, Range(0f, 1f)] private float volume = 0.8f;
 
         private AudioSource source;
+        // The clips actually played: the assigned clip, or its placeholder fallback (resolved once in Awake).
         private AudioClip throwSfx, hitTargetSfx, hitObstacleSfx, invalidSfx, enterSfx, leaveSfx, collectSfx, catchSfx;
 
+        // Awake: set up our own component and clips (runs before OnEnable). [RequireComponent]
+        // guarantees the AudioSource exists, so GetComponent cannot return null here.
         private void Awake()
         {
             source = GetComponent<AudioSource>();
             source.playOnAwake = false;
             source.spatialBlend = 0f;   // 2D UI-style sounds
 
+            // Fallback per slot: use the Inspector clip if set, else synthesize a tone once.
+            // Rising pitch = positive (throw, enter, collect), falling = return/impact,
+            // low square wave = error/thud.
             throwSfx = throwClip != null ? throwClip : PlaceholderTones.Sweep("Throw", 300f, 750f, 0.2f);
             hitTargetSfx = hitTargetClip != null ? hitTargetClip : PlaceholderTones.Sweep("HitTarget", 1100f, 600f, 0.15f, PlaceholderTones.Wave.Square);
             hitObstacleSfx = hitObstacleClip != null ? hitObstacleClip : PlaceholderTones.Sweep("HitObstacle", 220f, 110f, 0.18f, PlaceholderTones.Wave.Square);
@@ -50,6 +60,9 @@ namespace BoomerangGuardian.Audio
             catchSfx = catchClip != null ? catchClip : PlaceholderTones.Sweep("Catch", 700f, 500f, 0.08f);
         }
 
+        // Subscribe in OnEnable, unsubscribe in OnDisable (matched pairs), so a disabled or
+        // destroyed AudioManager never receives callbacks. Static events (Collectible.AnyCollected)
+        // especially need this, because they outlive individual objects.
         private void OnEnable()
         {
             if (thrower != null)
@@ -86,6 +99,7 @@ namespace BoomerangGuardian.Audio
             Collectible.AnyCollected -= OnCollected;
         }
 
+        // Handlers ignore the event arguments (named _ / __); each one just plays its sound.
         private void OnThrown(BoomerangProjectile _) => Play(throwSfx);
         private void OnTargetHit(Target _) => Play(hitTargetSfx);
         private void OnObstacleHit(Obstacle _) => Play(hitObstacleSfx);
@@ -95,6 +109,10 @@ namespace BoomerangGuardian.Audio
         private void OnPlatformExited() => Play(leaveSfx);
         private void OnCollected(Collectible _) => Play(collectSfx);
 
+        /// <summary>
+        /// PlayOneShot lets several sounds overlap on one AudioSource (e.g. a hit while the throw
+        /// sound still plays) instead of cutting each other off. <paramref name="scale"/> makes a clip quieter.
+        /// </summary>
         private void Play(AudioClip clip, float scale = 1f)
         {
             if (clip != null) source.PlayOneShot(clip, volume * scale);

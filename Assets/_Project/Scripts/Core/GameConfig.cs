@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace BoomerangGuardian.Core
 {
+    /// <summary>What SpawnManager.Respawn() does when the player leaves the Guardian Platform (PB-12).</summary>
     public enum RespawnMode
     {
         /// <summary>Generate a fresh random layout at full count.</summary>
@@ -15,14 +16,19 @@ namespace BoomerangGuardian.Core
     /// <summary>
     /// Runtime-tunable settings read from config.json (ADR-0008).
     /// Field names are the JSON keys, so they stay lowerCamelCase.
+    /// A plain [Serializable] C# class (not a MonoBehaviour), because JsonUtility only serializes
+    /// public / [SerializeField] fields. Public fields are an exception to our "no public fields"
+    /// rule here: they are the JSON schema. ConfigLoader creates and validates instances.
     /// </summary>
     [Serializable]
     public class GameConfig
     {
+        // Limits from the assignment spec; Validate() enforces them.
         public const int MaxTotalObjects = 500;
         public const int MinTargets = 100;
         public const int MinObstacles = 100;
 
+        // Stored as a string because JsonUtility writes enums as numbers; text is easier to edit in the file.
         [Tooltip("\"Regenerate\" or \"Restore\" — what happens when the player leaves the platform.")]
         public string respawnMode = nameof(RespawnMode.Regenerate);
         [Tooltip("0 = different layout every run; any other value = repeatable layout.")]
@@ -42,6 +48,7 @@ namespace BoomerangGuardian.Core
         public float boomerangSpeed = 20f;
         public float boomerangCooldown = 3f;
 
+        /// <summary>Parsed respawnMode: case-insensitive "Restore", anything else means Regenerate.</summary>
         public RespawnMode RespawnMode =>
             string.Equals(respawnMode, nameof(RespawnMode.Restore), StringComparison.OrdinalIgnoreCase)
                 ? RespawnMode.Restore
@@ -57,19 +64,24 @@ namespace BoomerangGuardian.Core
         public string Validate()
         {
             var changes = new StringBuilder();
+            // Local function: records "key: old → new" whenever clamping changed a value.
             void Note<T>(string key, T before, T after)
             {
                 if (!Equals(before, after)) changes.Append($"{key}: {before} → {after}; ");
             }
 
+            // Normalize the string (e.g. "restore" or a typo) to the exact enum name.
             string mode = RespawnMode.ToString();
             Note(nameof(respawnMode), respawnMode, mode);
             respawnMode = mode;
 
             int t = targetCount, o = obstacleCount, c = collectibleCount;
+            // Each count ≥ its minimum, so the total is always ≥ 200.
             targetCount = Mathf.Clamp(targetCount, MinTargets, 300);
             obstacleCount = Mathf.Clamp(obstacleCount, MinObstacles, 300);
             collectibleCount = Mathf.Clamp(collectibleCount, 0, 100);
+            // Total above 500: trim collectibles first (optional content), then obstacles.
+            // Targets are at most 300, so 500 - targets is at least 200: obstacles stay above their minimum.
             if (TotalObjects > MaxTotalObjects)
                 collectibleCount = Mathf.Max(0, MaxTotalObjects - targetCount - obstacleCount);
             if (TotalObjects > MaxTotalObjects)
@@ -80,7 +92,7 @@ namespace BoomerangGuardian.Core
 
             float n = normalSpeed, f = fastSpeed;
             normalSpeed = Mathf.Clamp(normalSpeed, 1f, 20f);
-            fastSpeed = Mathf.Clamp(fastSpeed, normalSpeed + 1f, 40f);
+            fastSpeed = Mathf.Clamp(fastSpeed, normalSpeed + 1f, 40f);   // fast is always faster than normal
             Note(nameof(normalSpeed), n, normalSpeed);
             Note(nameof(fastSpeed), f, fastSpeed);
 

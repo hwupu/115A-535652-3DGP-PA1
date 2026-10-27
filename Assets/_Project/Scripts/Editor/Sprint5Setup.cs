@@ -16,6 +16,9 @@ namespace BoomerangGuardian.EditorTools
     /// <summary>
     /// Sprint 5 setup (ADR-0009): fade material for ghosts that float away (ADR-0010), ghosts wandering
     /// around (IdleWander, PB-20) and the hover trajectory preview (PB-29).
+    /// Why a fade material asset: Unity strips shader variants that no asset uses from builds. A target
+    /// that switches its material to transparent only at runtime could render opaque in a build, so each
+    /// target prefab references M_TargetFade (already transparent) to keep those variants included.
     /// Idempotent. Rerun after adding target variants.
     /// Menu: Boomerang Guardian → Setup → Sprint 5 (Art Polish)
     /// Batch: -executeMethod BoomerangGuardian.EditorTools.Sprint5Setup.RunBatch
@@ -27,6 +30,7 @@ namespace BoomerangGuardian.EditorTools
         private const string MainScenePath = SetupUtils.ProjectRoot + "/Scenes/Main.unity";
         private const string PreviewMaterialPath = SetupUtils.ProjectRoot + "/Materials/M_TrajectoryPreview.mat";
 
+        /// <summary>Menu entry: refuses to run in Play Mode and lets the user save open scene changes first.</summary>
         [MenuItem("Boomerang Guardian/Setup/Sprint 5 (Art Polish)")]
         public static void RunFromMenu()
         {
@@ -41,8 +45,10 @@ namespace BoomerangGuardian.EditorTools
             EditorUtility.DisplayDialog("Sprint 5 setup finished", "Done. See the Console for the report.", "OK");
         }
 
+        /// <summary>Entry point for -executeMethod (no dialogs, so it works in -batchmode).</summary>
         public static void RunBatch() => Debug.Log(Run());
 
+        /// <summary>Runs all steps and returns the text report.</summary>
         private static string Run()
         {
             var u = new SetupUtils();
@@ -62,6 +68,8 @@ namespace BoomerangGuardian.EditorTools
             foreach (Target target in spawnConfig.TargetPrefabs) AddWander(u, target);
             SetUpTrajectoryPreview(u);
 
+            // Link the fade template on every target prefab. Prefabs are edited in an isolated preview
+            // scene (LoadPrefabContents) and always unloaded in finally, even after `continue`.
             foreach (Target target in spawnConfig.TargetPrefabs)
             {
                 if (target == null) continue;
@@ -70,6 +78,7 @@ namespace BoomerangGuardian.EditorTools
                 try
                 {
                     var t = root.GetComponent<Target>();
+                    // Private [SerializeField] fields are set through SerializedObject, like the Inspector does.
                     var so = new SerializedObject(t);
                     SerializedProperty template = so.FindProperty("fadeMaterialTemplate");
                     if (template.objectReferenceValue != null)
@@ -95,6 +104,7 @@ namespace BoomerangGuardian.EditorTools
             return Report(u, scene);
         }
 
+        /// <summary>Creates (once) M_TargetFade: a transparent URP Lit material used as the template for fading targets (ADR-0010).</summary>
         private static Material GetOrCreateFadeMaterial(SetupUtils u)
         {
             var material = AssetDatabase.LoadAssetAtPath<Material>(FadeMaterialPath);
@@ -109,6 +119,8 @@ namespace BoomerangGuardian.EditorTools
             // Keep the variants a textured, glowing model needs (normal map + emission) in builds.
             material.EnableKeyword("_NORMALMAP");
             material.EnableKeyword("_EMISSION");
+            // Black emission = no glow by default. At runtime Target copies this template and
+            // MaterialUtility.CopyLitProperties brings over each model's own maps and colors (incl. emission).
             material.SetColor(MaterialUtility.EmissionColor, Color.black);
             material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
             AssetDatabase.CreateAsset(material, FadeMaterialPath);
@@ -116,7 +128,10 @@ namespace BoomerangGuardian.EditorTools
             return material;
         }
 
-        /// <summary>Ghosts drift and spin (PB-20): IdleWander on the target's visual child.</summary>
+        /// <summary>
+        /// Ghosts drift and spin (PB-20): IdleWander on the target's visual child.
+        /// Only the visual moves, so the root's collider and Rigidbody (spawn checks, picking) stay put.
+        /// </summary>
         private static void AddWander(SetupUtils u, Target target)
         {
             if (target == null) return;
@@ -130,6 +145,8 @@ namespace BoomerangGuardian.EditorTools
                     return;
                 }
                 // The visual = the top-level child holding the first non-icon renderer.
+                // Find a renderer (skipping minimap icons and the root), then walk up the parents
+                // until we reach the direct child of the root.
                 Transform visual = null;
                 foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
                 {
@@ -154,7 +171,11 @@ namespace BoomerangGuardian.EditorTools
             }
         }
 
-        /// <summary>Hover trajectory preview (PB-29): a LineRenderer child of the Player.</summary>
+        /// <summary>
+        /// Hover trajectory preview (PB-29): a LineRenderer child of the Player.
+        /// TrajectoryPreview reads the hovered target via TargetSelector and draws the boomerang's
+        /// Bézier path; it gets its references here and starts with the line hidden.
+        /// </summary>
         private static void SetUpTrajectoryPreview(SetupUtils u)
         {
             PlayerMotor motor = Object.FindFirstObjectByType<PlayerMotor>();
@@ -183,6 +204,8 @@ namespace BoomerangGuardian.EditorTools
             go.transform.SetParent(motor.transform, false);
             var line = go.AddComponent<LineRenderer>();
             line.sharedMaterial = material;
+            // World-space points, so the path does not move when the player turns; View alignment makes
+            // the line always face the camera; hidden until the mouse hovers a target.
             line.useWorldSpace = true;
             line.widthMultiplier = 0.06f;
             line.numCapVertices = 4;
@@ -202,6 +225,7 @@ namespace BoomerangGuardian.EditorTools
             u.Created("Player/TrajectoryPreview (LineRenderer, 50 % green = valid / red = invalid)");
         }
 
+        /// <summary>Saves the scene and assets, then returns the log plus the WiringValidator report.</summary>
         private static string Report(SetupUtils u, Scene scene)
         {
             EditorSceneManager.MarkSceneDirty(scene);

@@ -22,6 +22,11 @@ namespace BoomerangGuardian.Spawning
     ///
     /// Platform support (PB-12): HideAll() hides everything; Respawn() regenerates or restores
     /// according to config.json respawnMode.
+    ///
+    /// Talks to: GuardianPlatform calls HideAll()/Respawn(); HudController and JourneyController
+    /// read TargetsSpawned / TargetsRemaining / IsHidden. Counts come from ConfigLoader.Current
+    /// (config.json), falling back to the Inspector values. Prefabs come from the SpawnConfig asset,
+    /// so this script never references a specific art asset.
     /// </summary>
     public class SpawnManager : MonoBehaviour
     {
@@ -61,12 +66,18 @@ namespace BoomerangGuardian.Spawning
         [Tooltip("Layers treated as existing scene geometry (walls, props) during placement.")]
         [SerializeField] private LayerMask blockingMask = ~0;
 
+        /// <summary>Raised after a fresh layout has been spawned.</summary>
         public event Action Spawned;
+        /// <summary>Raised after HideAll() (player stepped on the platform).</summary>
         public event Action Hidden;
+        /// <summary>Raised after Respawn() in Restore mode (Regenerate raises Spawned instead).</summary>
         public event Action Restored;
 
+        /// <summary>True while the world is hidden because the player is on the platform.</summary>
         public bool IsHidden { get; private set; }
+        /// <summary>Number of targets in the current layout (hit or not).</summary>
         public int TargetsSpawned => targets.Count;
+        /// <summary>Targets not yet hit. Destroyed targets compare equal to null, so they are skipped.</summary>
         public int TargetsRemaining
         {
             get
@@ -78,6 +89,7 @@ namespace BoomerangGuardian.Spawning
             }
         }
 
+        // Size of a prefab seen from above: a circle (radius around the pivot) plus a height.
         private readonly struct Footprint
         {
             public readonly float Radius;
@@ -85,6 +97,7 @@ namespace BoomerangGuardian.Spawning
             public Footprint(float radius, float height) { Radius = radius; Height = height; }
         }
 
+        // An object already placed this round, as a circle on the XZ ground plane.
         private readonly struct Placement
         {
             public readonly Vector2 Position;
@@ -98,8 +111,10 @@ namespace BoomerangGuardian.Spawning
         private readonly List<Obstacle> obstacles = new List<Obstacle>();
         private readonly List<Collectible> collectibles = new List<Collectible>();
         private readonly List<Placement> placements = new List<Placement>();
-        private readonly Dictionary<GameObject, Footprint> footprints = new Dictionary<GameObject, Footprint>();
+        private readonly Dictionary<GameObject, Footprint> footprints = new Dictionary<GameObject, Footprint>();   // cache: measure each prefab once
 
+        // Start (not Awake): ConfigLoader runs first (DefaultExecutionOrder -100) and loads config.json
+        // in its Awake, so ConfigLoader.Current is ready here.
         private void Start() => SpawnAll();
 
         /// <summary>Destroys any previous objects and spawns a fresh random layout.</summary>
@@ -112,17 +127,23 @@ namespace BoomerangGuardian.Spawning
             }
 
             DestroyAll();
+            // config is null when no ConfigLoader is in the scene; "?." and "??" then fall back
+            // to the Inspector values below.
             GameConfig config = ConfigLoader.Current;
             int seed = config?.randomSeed ?? 0;
+            // Seed 0 = new layout every run; any other seed makes the layout repeatable (useful for demos).
             if (seed != 0) Random.InitState(seed);
 
+            // Stopwatch only measures how long the placement takes, for the log line.
             var watch = System.Diagnostics.Stopwatch.StartNew();
             int failed = 0;
+            // Targets first, then obstacles, then collectibles: each group must avoid all earlier ones.
             failed += SpawnGroup(spawnConfig.TargetPrefabs, config?.targetCount ?? targetCount, targets, "Targets");
             failed += SpawnGroup(spawnConfig.ObstaclePrefabs, config?.obstacleCount ?? obstacleCount, obstacles, "Obstacles");
             failed += SpawnGroup(spawnConfig.CollectiblePrefabs, config?.collectibleCount ?? collectibleCount, collectibles, "Collectibles");
             watch.Stop();
 
+            // Proof for the "no initial overlap" requirement: should always log 0 overlapping pairs.
             int overlaps = CountOverlappingPairs();
             int total = targets.Count + obstacles.Count + collectibles.Count;
             string summary = $"SpawnManager: {targets.Count} targets + {obstacles.Count} obstacles + {collectibles.Count} collectibles " +
@@ -149,6 +170,8 @@ namespace BoomerangGuardian.Spawning
             RespawnMode mode = ConfigLoader.Current?.RespawnMode ?? respawnMode;
             Debug.Log($"SpawnManager: respawning ({mode}).", this);
 
+            // Regenerate: brand-new random layout at full count.
+            // Restore: re-activate the hidden objects; targets already hit (destroyed) stay gone.
             if (mode == RespawnMode.Regenerate)
             {
                 SpawnAll();
@@ -160,6 +183,11 @@ namespace BoomerangGuardian.Spawning
             Restored?.Invoke();
         }
 
+        /// <summary>
+        /// Spawns <paramref name="count"/> random picks from <paramref name="prefabs"/> into a named group.
+        /// Generic over the component type (Target / Obstacle / Collectible), so one method serves all
+        /// three lists. Returns how many could not be placed.
+        /// </summary>
         private int SpawnGroup<T>(IReadOnlyList<T> prefabs, int count, List<T> spawned, string groupName) where T : Component
         {
             if (count <= 0) return 0;
@@ -179,17 +207,27 @@ namespace BoomerangGuardian.Spawning
                 Footprint footprint = GetFootprint(prefab.gameObject);
                 if (!TryFindPosition(footprint, out Vector3 position)) { failed++; continue; }
 
+                // Random yaw only (around Y) so objects stay upright. The footprint radius already
+                // covers every yaw, so rotating cannot create an overlap.
                 Quaternion rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+                // Instantiate(prefab component) returns the same component on the clone, typed as T.
                 T instance = Instantiate(prefab, position, rotation, group);
                 instance.name = $"{prefab.name}_{spawned.Count + 1:000}";
                 spawned.Add(instance);
+                // Remember the circle we just used, so later candidates keep their distance from it.
                 placements.Add(new Placement(new Vector2(position.x, position.z), footprint.Radius));
             }
             return failed;
         }
 
+        /// <summary>
+        /// Rejection sampling: try random ground points until one passes every check,
+        /// or give up after maxAttemptsPerObject tries.
+        /// </summary>
         private bool TryFindPosition(Footprint footprint, out Vector3 position)
         {
+            // Shrink the sampling rectangle by the wall margin and the object's own radius,
+            // so even the object's edge stays inside the walls.
             float halfX = regionSize.x * 0.5f - wallMargin - footprint.Radius;
             float halfZ = regionSize.y * 0.5f - wallMargin - footprint.Radius;
             if (halfX <= 0f || halfZ <= 0f)
@@ -203,6 +241,7 @@ namespace BoomerangGuardian.Spawning
                 Vector3 candidate = regionCenter + new Vector3(Random.Range(-halfX, halfX), 0f, Random.Range(-halfZ, halfZ));
                 var xz = new Vector2(candidate.x, candidate.z);
 
+                // Cheap 2D distance checks first; the physics query (most expensive) runs last.
                 if (IsInside(xz, platform, platformClearRadius + footprint.Radius)) continue;
                 if (IsInside(xz, player, playerClearRadius + footprint.Radius)) continue;
                 if (OverlapsPlaced(xz, footprint.Radius)) continue;
@@ -216,23 +255,32 @@ namespace BoomerangGuardian.Spawning
             return false;
         }
 
+        /// <summary>True if the XZ point lies within <paramref name="radius"/> of the transform (exclusion zone).</summary>
         private static bool IsInside(Vector2 xz, Transform center, float radius)
         {
             if (center == null) return false;
             var c = new Vector2(center.position.x, center.position.z);
+            // Compare squared lengths: same result as distance < radius, without a square root.
             return (xz - c).sqrMagnitude < radius * radius;
         }
 
+        /// <summary>Circle-vs-circle test against everything placed earlier in this round.</summary>
         private bool OverlapsPlaced(Vector2 xz, float radius)
         {
             foreach (Placement p in placements)
             {
+                // Two circles don't touch if their centers are further apart than the sum of radii (+ gap).
                 float minDistance = radius + p.Radius + spacing;
                 if ((xz - p.Position).sqrMagnitude < minDistance * minDistance) return true;
             }
             return false;
         }
 
+        /// <summary>
+        /// Physics test against existing scene colliders (walls, props) on blockingMask.
+        /// Uses an axis-aligned box that encloses the footprint circle, lifted slightly off the
+        /// ground so the floor collider itself does not count as a hit. Triggers are ignored.
+        /// </summary>
         private bool OverlapsScene(Vector3 groundPoint, Footprint footprint)
         {
             float halfHeight = Mathf.Max(0.05f, (footprint.Height - GroundClearance) * 0.5f);
@@ -249,9 +297,13 @@ namespace BoomerangGuardian.Spawning
         {
             if (footprints.TryGetValue(prefab, out Footprint cached)) return cached;
 
+            // Spawn a throw-away copy far below the arena so it can't touch anything.
             Vector3 probePosition = new Vector3(0f, -10000f, 0f);
             GameObject probe = Instantiate(prefab, probePosition, Quaternion.identity);
+            // Push the new transform to the physics engine now, so Collider.bounds is up to date.
             Physics.SyncTransforms();
+
+            // Union of all collider and renderer bounds = the full space the object occupies.
 
             bool hasBounds = false;
             Bounds bounds = default;
@@ -260,19 +312,24 @@ namespace BoomerangGuardian.Spawning
             foreach (Renderer r in probe.GetComponentsInChildren<Renderer>())
                 if (r.GetComponentInParent<MinimapIcon>() == null)   // icons float high above; not part of the footprint
                     Encapsulate(ref bounds, ref hasBounds, r.bounds);
+            // Immediate, so the probe never exists for a physics step or a frame.
             DestroyImmediate(probe);
 
             Footprint footprint;
             if (!hasBounds)
             {
-                footprint = new Footprint(0.5f, 1f);
+                footprint = new Footprint(0.5f, 1f);   // nothing measurable: small default
             }
             else
             {
+                // Bounds relative to the pivot (the prefab's ground contact point).
                 Vector3 min = bounds.min - probePosition;
                 Vector3 max = bounds.max - probePosition;
+                // Farthest X and Z extent from the pivot; the corner (x, z) is the farthest point of the box.
                 float x = Mathf.Max(Mathf.Abs(min.x), Mathf.Abs(max.x));
                 float z = Mathf.Max(Mathf.Abs(min.z), Mathf.Abs(max.z));
+                // Pythagoras: a circle of radius sqrt(x² + z²) contains that box at ANY Y rotation.
+                // Height = top of the bounds above the pivot (at least 0.1 m).
                 footprint = new Footprint(Mathf.Sqrt(x * x + z * z), Mathf.Max(0.1f, max.y));
             }
 
@@ -280,8 +337,10 @@ namespace BoomerangGuardian.Spawning
             return footprint;
         }
 
+        /// <summary>Grows <paramref name="bounds"/> to include <paramref name="add"/>; the first non-empty box starts it.</summary>
         private static void Encapsulate(ref Bounds bounds, ref bool hasBounds, Bounds add)
         {
+            // Skip empty bounds: encapsulating them would wrongly stretch the box toward their center.
             if (add.size == Vector3.zero) return;
             if (hasBounds) bounds.Encapsulate(add);
             else { bounds = add; hasBounds = true; }
@@ -290,6 +349,7 @@ namespace BoomerangGuardian.Spawning
         /// <summary>Validation: counts pairs of spawned colliders that actually penetrate.</summary>
         private int CountOverlappingPairs()
         {
+            // The objects were just instantiated this frame; sync so physics sees their positions.
             Physics.SyncTransforms();
             var colliders = new List<Collider>();
             var owners = new List<int>();   // index of the spawned object each collider belongs to
@@ -305,6 +365,7 @@ namespace BoomerangGuardian.Spawning
                 owner++;
             }
 
+            // Check every unordered pair once (j starts at i + 1).
             int overlaps = 0;
             for (int i = 0; i < colliders.Count; i++)
             {
@@ -313,8 +374,10 @@ namespace BoomerangGuardian.Spawning
                 {
                     Collider b = colliders[j];
                     if (owners[i] == owners[j]) continue;   // parts of the same object
-                    if (!a.bounds.Intersects(b.bounds)) continue;
+                    if (!a.bounds.Intersects(b.bounds)) continue;   // cheap AABB pre-filter
 
+                    // Exact shape test: returns true and a depth if the two colliders really penetrate.
+                    // Touching within 1 mm is not counted as an overlap.
                     if (Physics.ComputePenetration(a, a.transform.position, a.transform.rotation,
                             b, b.transform.position, b.transform.rotation, out _, out float distance) && distance > 0.001f)
                         overlaps++;
@@ -323,6 +386,7 @@ namespace BoomerangGuardian.Spawning
             return overlaps;
         }
 
+        /// <summary>Iterator (yield return) over all three spawned lists, without building a new list.</summary>
         private IEnumerable<Component> AllSpawned()
         {
             foreach (Target t in targets) yield return t;
@@ -330,8 +394,10 @@ namespace BoomerangGuardian.Spawning
             foreach (Collectible c in collectibles) yield return c;
         }
 
+        /// <summary>Hide/show by SetActive: objects keep their state (and position) for Restore mode.</summary>
         private void SetAllActive(bool active)
         {
+            // c != null skips targets that were already hit and destroyed.
             foreach (Component c in AllSpawned())
                 if (c != null) c.gameObject.SetActive(active);
         }
@@ -352,6 +418,7 @@ namespace BoomerangGuardian.Spawning
             placements.Clear();
         }
 
+        /// <summary>Finds or creates the child folder (e.g. Spawned/Targets) that keeps the Hierarchy tidy.</summary>
         private Transform GetGroup(string groupName)
         {
             if (spawnRoot == null) spawnRoot = new GameObject("Spawned").transform;
@@ -364,6 +431,7 @@ namespace BoomerangGuardian.Spawning
             return group;
         }
 
+        // Editor-only drawing when selected: green = usable spawn area, cyan = platform / player clear zones.
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.green;

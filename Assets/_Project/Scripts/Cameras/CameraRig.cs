@@ -19,7 +19,10 @@ namespace BoomerangGuardian.Cameras
     /// - Scroll wheel changes third-person distance.
     /// - The third-person camera is pulled in when static geometry (walls, platform) is
     ///   in the way. Pushable Rigidbodies are ignored, to avoid jitter among many obstacles.
+    /// - Hold MMB for an orbit preview (PB-30): camera-only offsets that ease back on release.
     /// The rig owns yaw; PlayerMotor reads <see cref="Yaw"/> to move and turn the player.
+    /// Other links: polls PlayerInputReader; TargetSelector ray-casts through <see cref="ViewCamera"/>;
+    /// TrajectoryPreview hides while <see cref="IsOrbiting"/>; JourneyController listens to <see cref="ModeChanged"/>.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public class CameraRig : MonoBehaviour
@@ -72,21 +75,24 @@ namespace BoomerangGuardian.Cameras
         /// <summary>Raised when V switches the camera mode.</summary>
         public event Action<CameraMode> ModeChanged;
 
+        /// <summary>Current view: first or third person.</summary>
         public CameraMode Mode { get; private set; }
         /// <summary>Gameplay yaw: the player moves and faces by this. The orbit preview does not change it.</summary>
         public float Yaw => yaw;
         /// <summary>True while the middle-mouse orbit preview is held.</summary>
         public bool IsOrbiting { get; private set; }
+        /// <summary>The Camera component on this object; used for ScreenPointToRay when clicking.</summary>
         public Camera ViewCamera { get; private set; }
 
+        // Never let collision pull the camera closer than this, or it would clip into the player.
         private const float MinCollisionDistance = 0.3f;
 
         private readonly RaycastHit[] collisionHits = new RaycastHit[16];
         private float yaw;
         private float pitch;
-        private float targetDistance;
-        private float currentDistance;
-        private float zoomVelocity;
+        private float targetDistance;    // where the scroll wheel wants the camera
+        private float currentDistance;   // smoothed value actually used (SmoothDamp toward targetDistance)
+        private float zoomVelocity;      // SmoothDamp's internal state
         private bool cursorLocked;
         private bool skipNextLookDelta;
         private float orbitYaw, orbitPitch;             // camera-only offsets while orbiting
@@ -98,6 +104,7 @@ namespace BoomerangGuardian.Cameras
             targetDistance = currentDistance = Mathf.Clamp(startDistance, distanceLimits.x, distanceLimits.y);
         }
 
+        // Start (not Awake): SetMode raises ModeChanged, and by Start all listeners have subscribed in OnEnable.
         private void Start()
         {
             if (target == null)
@@ -120,14 +127,18 @@ namespace BoomerangGuardian.Cameras
         private void OnDisable()
         {
             if (input != null) input.SwitchViewPressed -= ToggleMode;
-            SetCursorLocked(false);
+            SetCursorLocked(false);   // never leave the cursor locked if the rig is turned off
         }
 
+        // LateUpdate runs after all Update calls and after the player's interpolated transform is set,
+        // so the camera follows the final player position for this frame (no jitter).
         private void LateUpdate()
         {
             UpdateLook();
             UpdateZoom();
 
+            // Euler(pitch, yaw, 0): pitch around X tilts up/down, yaw around Y turns left/right, no roll.
+            // The orbit offsets are added on top, so they never change the gameplay yaw.
             Quaternion rotation = Quaternion.Euler(pitch + orbitPitch, yaw + orbitYaw, 0f);
             if (Mode == CameraMode.FirstPerson)
             {
@@ -135,6 +146,8 @@ namespace BoomerangGuardian.Cameras
             }
             else
             {
+                // Third person: start at a pivot above the player and step backwards along the view
+                // direction. rotation * Vector3.back is the camera's own "behind" direction in world space.
                 Vector3 pivot = target.position + pivotOffset;
                 Vector3 back = rotation * Vector3.back;
                 float distance = ResolveCollision(pivot, back, currentDistance);
@@ -142,6 +155,10 @@ namespace BoomerangGuardian.Cameras
             }
         }
 
+        /// <summary>
+        /// Applies mouse movement. RMB changes yaw/pitch (the player turns with it);
+        /// MMB changes only the orbit offsets, which ease back to zero on release.
+        /// </summary>
         private void UpdateLook()
         {
             bool looking = input != null && input.IsLookHeld;              // RMB: turns camera + player
@@ -156,6 +173,8 @@ namespace BoomerangGuardian.Cameras
             if (!IsOrbiting)
             {
                 // Ease the orbit offsets back to zero: the view returns to where it was.
+                // SmoothDamp is a critically damped spring (smooth, no overshoot); the Angle version
+                // takes the short way around 360 degrees.
                 orbitYaw = Mathf.SmoothDampAngle(orbitYaw, 0f, ref orbitYawVelocity, orbitReturnTime);
                 orbitPitch = Mathf.SmoothDamp(orbitPitch, 0f, ref orbitPitchVelocity, orbitReturnTime);
             }
@@ -172,12 +191,13 @@ namespace BoomerangGuardian.Cameras
             if (looking)
             {
                 yaw += delta.x * lookSensitivity;
-                pitch -= delta.y * lookSensitivity;
+                pitch -= delta.y * lookSensitivity;   // mouse up = look up = negative pitch
                 pitch = ClampPitch(pitch);
             }
             else
             {
                 orbitYaw += delta.x * lookSensitivity;
+                // Clamp the combined pitch (base + offset), then store only the offset part.
                 orbitPitch = ClampPitch(pitch + orbitPitch - delta.y * lookSensitivity) - pitch;
             }
         }
@@ -190,9 +210,14 @@ namespace BoomerangGuardian.Cameras
                 float scroll = Mathf.Clamp(input.Zoom, -1f, 1f);
                 targetDistance = Mathf.Clamp(targetDistance - scroll * zoomStep, distanceLimits.x, distanceLimits.y);
             }
+            // The scroll moves targetDistance in steps; SmoothDamp glides currentDistance there.
             currentDistance = Mathf.SmoothDamp(currentDistance, targetDistance, ref zoomVelocity, zoomSmoothTime);
         }
 
+        /// <summary>
+        /// Sphere-casts from the pivot toward the desired camera spot and returns how far the camera
+        /// can go before hitting static geometry. A sphere (not a ray) keeps the near plane out of walls.
+        /// </summary>
         private float ResolveCollision(Vector3 pivot, Vector3 direction, float desiredDistance)
         {
             int count = Physics.SphereCastNonAlloc(pivot, collisionRadius, direction, collisionHits,
@@ -202,6 +227,7 @@ namespace BoomerangGuardian.Cameras
             for (int i = 0; i < count; i++)
             {
                 RaycastHit hit = collisionHits[i];
+                // Skip hits that start overlapped (distance 0) and the player's own colliders.
                 if (hit.distance <= 0f || hit.transform.IsChildOf(target)) continue;
 
                 Rigidbody hitBody = hit.collider.attachedRigidbody;
@@ -215,11 +241,13 @@ namespace BoomerangGuardian.Cameras
         private void ToggleMode() =>
             SetMode(Mode == CameraMode.FirstPerson ? CameraMode.ThirdPerson : CameraMode.FirstPerson);
 
+        /// <summary>Switches view, re-clamps pitch to the new mode's limits, and notifies listeners.</summary>
         private void SetMode(CameraMode mode)
         {
             Mode = mode;
             pitch = ClampPitch(pitch);
 
+            // First person: the body still casts a shadow but is not drawn, so it does not block the view.
             ShadowCastingMode shadowMode = mode == CameraMode.FirstPerson ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
             foreach (Renderer r in hideInFirstPerson)
                 if (r != null) r.shadowCastingMode = shadowMode;
@@ -234,6 +262,7 @@ namespace BoomerangGuardian.Cameras
             return Mathf.Clamp(value, limits.x, limits.y);
         }
 
+        // Locked = cursor hidden and pinned to the window center; mouse delta still arrives.
         private void SetCursorLocked(bool locked)
         {
             cursorLocked = locked;

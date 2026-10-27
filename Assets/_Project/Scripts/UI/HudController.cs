@@ -12,6 +12,13 @@ namespace BoomerangGuardian.UI
     /// <summary>
     /// Heads-up display (PB-14): score, targets hit / remaining, speed + camera mode,
     /// boomerang cooldown bar, and short messages (invalid selection, hits, platform).
+    /// Two data paths:
+    /// - Polling: Update() reads continuously changing values (score, counts, speed, view,
+    ///   cooldown) from the source components every frame.
+    /// - Events: one-off moments (TargetSelector.SelectionRejected, ScoreManager.ScoreChanged,
+    ///   GuardianPlatform.PlayerEntered/PlayerExited) trigger a fading message.
+    /// JourneyController also calls <see cref="ShowMessage"/> for stage announcements.
+    /// The HUD only reads game state; it never changes it.
     /// </summary>
     public class HudController : MonoBehaviour
     {
@@ -41,8 +48,11 @@ namespace BoomerangGuardian.UI
         [SerializeField] private Color goodColor = new Color(0.5f, 1f, 0.5f);
         [SerializeField] private Color infoColor = new Color(0.6f, 0.85f, 1f);
 
+        // Time the current message was shown. -Infinity means "very old", so no message is visible at start.
         private float messageTime = float.NegativeInfinity;
 
+        // Subscribe in OnEnable and unsubscribe in OnDisable, a matched pair. This avoids
+        // callbacks into a disabled or destroyed HUD and avoids double subscriptions.
         private void OnEnable()
         {
             if (selector != null) selector.SelectionRejected += OnSelectionRejected;
@@ -72,11 +82,13 @@ namespace BoomerangGuardian.UI
 
         private void Update()
         {
+            // SetText with {0} placeholders formats numbers without allocating a new string each frame.
             if (scoreText != null && score != null)
                 scoreText.SetText("Score: {0}", score.Score);
 
             if (targetsText != null && spawner != null && score != null)
             {
+                // While the player stands on the Guardian Platform the SpawnManager hides every object.
                 if (spawner.IsHidden) targetsText.SetText("The world has vanished. Leave the platform!");
                 else targetsText.SetText("Targets hit: {0}   Remaining: {1}", score.TargetsHit, spawner.TargetsRemaining);
             }
@@ -92,11 +104,15 @@ namespace BoomerangGuardian.UI
             UpdateMessageFade();
         }
 
+        /// <summary>Draws the cooldown bar and label from BoomerangThrower's cooldown state.</summary>
         private void UpdateCooldown()
         {
             if (thrower == null) return;
             if (cooldownFill != null)
             {
+                // The bar is stretched by its anchors, not by scale: anchorMax.x is the right edge
+                // as a fraction of the parent width. CooldownProgress goes 0 (just thrown) to 1 (ready).
+                // anchorMax is a struct, so copy it, change x, and assign it back.
                 Vector2 max = cooldownFill.anchorMax;
                 max.x = thrower.CooldownProgress;
                 cooldownFill.anchorMax = max;
@@ -108,13 +124,20 @@ namespace BoomerangGuardian.UI
             }
         }
 
+        /// <summary>Message alpha: fully visible for messageDuration, then a linear fade over messageFade seconds.</summary>
         private void UpdateMessageFade()
         {
             if (messageText == null) return;
+            // Time.time is scaled time, so a message freezes (does not fade) while the game is paused.
             float age = Time.time - messageTime;
+            // After the hold time, (age - duration) / fade goes 0 → 1, so alpha goes 1 → 0; Clamp01 keeps it in range.
             messageText.alpha = age <= messageDuration ? 1f : Mathf.Clamp01(1f - (age - messageDuration) / messageFade);
         }
 
+        /// <summary>
+        /// Shows a short message in the given color. Resetting messageTime restarts the
+        /// hold-then-fade timer, so a new message replaces the old one. Also used by JourneyController.
+        /// </summary>
         public void ShowMessage(string message, Color color)
         {
             if (messageText == null) return;
@@ -123,6 +146,7 @@ namespace BoomerangGuardian.UI
             messageTime = Time.time;
         }
 
+        // Event handlers: each one-off game event becomes a colored message (red = error, green = points, blue = info).
         private void OnSelectionRejected(SelectionResult reason, string message) => ShowMessage(message, errorColor);
         private void OnScoreChanged(int total, int added) => ShowMessage($"+{added}", goodColor);
         private void OnPlatformEntered() => ShowMessage("The Guardian Platform hides the world…", infoColor);
